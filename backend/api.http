@@ -1,0 +1,74 @@
+@baseURL = http://localhost:5001/api
+
+###
+# @name registerSuccess
+# Kullanıcı başarıyla kaydet
+POST {{baseURL}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "test-user-{{$randomInt}}@example.com",
+  "password": "password12345",
+  "name": "Test User"
+}
+
+###
+# @name registerFailDuplicateEmail
+# Aynı email ile tekrar kaydetmeyi dene (Hata Vermeli)
+# Önce yukarıdaki isteği bir kez çalıştırın, sonra bu isteği aynı email ile deneyin.
+POST {{baseURL}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "test-user-1@example.com",
+  "password": "password12345"
+}
+
+###
+# @name registerFailShortPassword
+# Kısa şifre ile kaydetmeyi dene (Hata Vermeli)
+POST {{baseURL}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "shortpass@example.com",
+  "password": "123"
+}
+
+###
+# @name loginSuccess
+# Başarıyla giriş yap
+# Önce başarılı bir şekilde kayıt olduğunuzdan emin olun.
+POST {{baseURL}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "test-user-1@example.com",
+  "password": "password12345"
+}
+
+###
+# @name loginFailWrongPassword
+# Yanlış şifre ile giriş yapmayı dene (Hata Vermeli)
+POST {{baseURL}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "test-user-1@example.com",
+  "password": "wrongpassword"
+}
+
+###
+# @name createProduct
+# Yeni bir ürün oluştur
+POST {{baseURL}}/products
+Content-Type: application/json
+
+{
+  "name": "Yeni Laptop Modeli",
+  "description": "Yüksek performanslı, en yeni nesil işlemcili laptop.",
+  "price": 25000.00,
+  "stock": 50,
+  "categoryId": 1,
+  "images": ["https://example.com/images/laptop.jpg"]
+}

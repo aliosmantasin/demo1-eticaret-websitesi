@@ -1,0 +1,67 @@
+name: 'ecommerce-project'
+
+services:
+  # PostgreSQL Veritabanı Servisi
+  postgres:
+    image: postgres:16-alpine
+    container_name: ecom_postgres_db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: ecom_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  # Backend API Servisi (Express.js)
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: ecom_backend_api
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./backend:/usr/src/app/backend
+    environment:
+      DATABASE_URL: postgresql://admin:password123@postgres:5432/ecom_db
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    command: pnpm dev
+
+  # Frontend Web Uygulaması (Next.js)
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: ecom_frontend_app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/usr/src/app/frontend
+      - /usr/src/app/.next
+    depends_on:
+      - backend
+    restart: unless-stopped
+    command: pnpm dev
+
+  # pgAdmin Servisi (Veritabanı Yönetim Arayüzü)
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: ecom_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: password123
+      PGADMIN_LISTEN_PORT: 80
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    name: ecom_postgres_data

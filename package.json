@@ -1,0 +1,14 @@
+{
+  "name": "ecommerce-project",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter \"./backend\" dev & pnpm --filter \"./frontend\" dev",
+    "build": "pnpm --filter \"./backend\" build && pnpm --filter \"./frontend\" build"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3"
+  }
+}
+
+
+
