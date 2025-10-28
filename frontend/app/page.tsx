@@ -1,20 +1,29 @@
-import ProductCard from '@/components/ProductCard';
+import { Banner } from '@/components/homepage/Banner';
+import { Bestsellers } from '@/components/homepage/Bestsellers';
+import { CategoryShowcase } from '@/components/homepage/CategoryShowcase';
+import { PromotionBanner } from '@/components/homepage/PromotionBanner';
+import { Reviews } from '@/components/homepage/Reviews';
+import { Assurance } from '@/components/homepage/Assurance';
 import { Product } from '@/types';
 
 async function getProducts(): Promise<Product[]> {
   try {
-    const res = await fetch('http://backend:5000/api/products', {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    const res = await fetch(`${apiUrl}/api/products`, {
       cache: 'no-store', // Sunucu tarafında her istekte veriyi yeniden çekmek için
     });
 
     if (!res.ok) {
-      throw new Error('Failed to fetch products');
+      console.error('Failed to fetch products:', res.statusText);
+      return [];
     }
 
-    return res.json();
+    const data = await res.json();
+    // Gelen verinin doğrudan bir dizi mi yoksa bir obje içinde mi olduğunu kontrol et
+    return Array.isArray(data) ? data : data.products;
   } catch (error) {
-    console.error('Error fetching products:', error);
-    return []; // Hata durumunda boş dizi dön
+    console.error("Error fetching products:", error);
+    return [];
   }
 }
 
@@ -22,18 +31,13 @@ export default async function Home() {
   const products = await getProducts();
 
   return (
-    <main className="container mx-auto p-8">
-      <h1 className="text-4xl font-bold mb-8">Çok Satanlar</h1>
-
-      {products.length === 0 ? (
-        <p>Gösterilecek ürün bulunamadı.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      )}
-    </main>
+    <>
+      <Banner />
+      <CategoryShowcase />
+      <Bestsellers products={products} />
+      <PromotionBanner />
+      <Reviews />
+      <Assurance />
+    </>
   );
 }

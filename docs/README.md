@@ -78,3 +78,48 @@ Detaylı kurulum adımları daha sonra eklenecektir.
     # .env.local dosyasını oluşturun
     pnpm dev
     ```
+
+## Projeyi Çalıştırma
+
+### 1. Ön Gereksinimler
+
+- Docker Desktop'ın bilgisayarınızda yüklü ve çalışır durumda olması gerekmektedir.
+- `pnpm` paket yöneticisinin yüklü olması gerekmektedir (`npm install -g pnpm`).
+
+### 2. Kurulum
+
+1. Projeyi klonladıktan sonra, projenin kök dizininde aşağıdaki komutu çalıştırarak tüm bağımlılıkları yükleyin:
+   ```bash
+   pnpm install
+   ```
+2. Docker servislerini (veritabanı, backend, frontend) ayağa kaldırmak için aşağıdaki komutu çalıştırın:
+   ```bash
+   docker-compose up -d --build
+   ```
+
+### 3. Geliştirme Ortamı
+
+Proje, pnpm workspaces kullanılarak bir monorepo olarak yapılandırılmıştır. Kök dizindeki `package.json` dosyası, tüm projeyi yöneten merkezi komutları içerir.
+
+- **Tüm Projeyi Geliştirme Modunda Başlatma:**
+  Aşağıdaki komut, hem backend API'sini hem de frontend Next.js sunucusunu aynı anda "hot-reload" (kod değiştikçe otomatik yeniden başlama) modunda çalıştırır.
+  ```bash
+  pnpm dev
+  ```
+  Bu komut aslında `backend` ve `frontend` klasörlerindeki `dev` script'lerini paralel olarak tetikler.
+
+- **Tüm Projeyi Üretim (Production) İçin Build Etme:**
+  Aşağıdaki komut, önce backend'i, ardından frontend'i üretim için hazırlar.
+  ```bash
+  pnpm build
+  ```
+
+### 4. Servislere Erişim
+
+- **Frontend (Next.js):** [http://localhost:3000](http://localhost:3000)
+- **Backend (Express.js):** [http://localhost:5000](http://localhost:5000)
+- **pgAdmin (Veritabanı Yönetimi):** [http://localhost:8080](http://localhost:8080)
+  - **Kullanıcı Adı:** `admin@example.com`
+  - **Şifre:** `admin`
+
+## Veritabanı Yönetimi (Prisma)

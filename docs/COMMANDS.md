@@ -144,3 +144,36 @@ docker-compose exec backend pnpm prisma generate
 # Lokalde (IDE hatası için)
 pnpm --filter ecom-backend exec prisma generate
 ```
+
+### `docker volume prune`
+
+Bu komut, herhangi bir konteyner tarafından o anda kullanılmayan tüm Docker volume'larını (veri saklama alanlarını) sistemden temizler. Projeleri sık sık yeniden başlatıp kurarken veya eski projelerden kalan artık verileri temizlemek istediğinizde diskte yer açmak için çok kullanışlıdır. Komutu çalıştırdığınızda, silinecek volume'ların bir listesini gösterir ve sizden onay (y/N) ister.
+
+---
+
+## Prisma Komutları Ne Zaman Çalıştırılmalı?
+
+`prisma` komutlarını her `docker-compose up --build` komutunda çalıştırmak **gerekmez**. Veritabanı verilerimiz `ecom_postgres_data` adlı bir `volume` içinde kalıcı olarak saklanır ve `docker-compose down` komutuyla silinmez. Bu komutları yalnızca belirli durumlarda çalıştırmalısınız:
+
+### 1. Veritabanını Sıfırdan Başlatırken
+
+Eğer veritabanını `docker-compose down -v` veya `docker volume rm ecom_postgres_data` komutuyla tamamen sildiyseniz, veritabanı boş olacaktır. Bu durumda tabloları oluşturmak ve ilk verileri eklemek için **her iki komutu da sırasıyla** çalıştırmalısınız:
+
+```bash
+# 1. Adım: Tabloları oluşturur
+docker-compose exec backend pnpm prisma migrate dev
+
+# 2. Adım: Başlangıç verilerini ekler
+docker-compose exec backend pnpm prisma db seed
+```
+
+### 2. Veritabanı Şemasını Değiştirdiğinizde
+
+Eğer `prisma/schema.prisma` dosyasında bir model üzerinde değişiklik yaptıysanız (örneğin, `Product` modeline yeni bir alan eklediyseniz), bu değişikliği veritabanına yansıtmak için **sadece `migrate dev` komutunu** çalıştırmanız yeterlidir.
+
+```bash
+# Sadece şema değişikliklerini uygula
+docker-compose exec backend pnpm prisma migrate dev --name <yaptiginiz_degisikligi_aciklayan_isim>
+```
+
+Bu iki senaryo dışında, çalışan bir veritabanı için `prisma` komutlarını tekrar çalıştırmanıza gerek yoktur.

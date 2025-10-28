@@ -62,20 +62,17 @@ Bu doküman, proje geliştirme sürecinde öğrenilen konuları, karşılaşıla
     - **Öğrenildi mi?** Evet.
     - **Notlar:** Temel şema değişiklikleri (örn: ID tipini `String`'den `Int`'e çevirmek) gibi durumlarda veritabanını sıfırlamak en temiz yöntemdir. Adımlar: `rm -rf prisma/migrations` (geçmişi sil), `docker-compose down -v` (konteynerleri ve volume'ü sil), `docker-compose up -d` (yeniden başlat), `pnpm prisma migrate dev` (yeni şemayı kur). `docker-compose down -v` komutu verileri kalıcı olarak siler.
 
-## 3. Veritabanı Yönetimi (Prisma)
+## 3. Monorepo Mimarisi (pnpm)
 
-- **[x] Prisma ORM'nin Rolü:**
-  - **Öğrenildi mi?** Evet.
-  - **Notlar:** Prisma, TypeScript kodumuz ile PostgreSQL veritabanı arasında bir "tercüman" görevi görür. Bizim yazdığımız `prisma.product.findMany()` gibi komutları, veritabanının anladığı `SELECT * FROM "Product";` gibi SQL sorgularına çevirir. Bu, karmaşık SQL yazma zorunluluğunu ortadan kaldırır.
-- **[x] `prisma/schema.prisma` Dosyası:**
-  - **Öğrenildi mi?** Evet.
-  - **Notlar:** Veritabanımızın ana planıdır. `User`, `Product`, `Category` gibi modeller (tablolar) ve bunların alanları (sütunları) burada tanımlanır. Veritabanı yapısındaki "tek doğru kaynak" bu dosyadır.
-- **[x] `prisma/migrations` Klasörü:**
-  - **Öğrenildi mi?** Evet.
-  - **Notlar:** Veritabanının versiyon geçmişini tutar. `schema.prisma`'da yapılan her değişiklik sonrası çalıştırılan `pnpm prisma migrate dev` komutu, değişiklikleri uygulayacak SQL kodlarını bu klasörde yeni bir dosya olarak oluşturur. Bu, veritabanı şemasının kod ile senkronize kalmasını sağlayan bir versiyon kontrol sistemidir.
-- **[x] `prisma/seed.ts` Dosyası (Tohumlama):**
-  - **Öğrenildi mi?** Evet.
-  - **Notlar:** Boş bir veritabanını başlangıç verileriyle doldurmak için kullanılan bir script'tir. Proje ilk kurulduğunda veya sıfırlandığında, uygulamayı test edebilmek için gerekli olan örnek ürün, kategori gibi verileri otomatik olarak ekler.
+- **[x] `pnpm workspace` ve `node_modules` Yapısı:**
+    - **Öğrenildi mi?** Evet.
+    - **Notlar:** `pnpm`, monorepo projelerinde verimlilik için akıllı bir `node_modules` yapısı kullanır. Kök dizindeki `node_modules` klasörü, tüm alt projelerin (`frontend`, `backend`) bağımlılıklarının **fiziksel kopyalarını** barındıran ana depodur. Alt proje klasörleri (`frontend/node_modules`) içinde ise paketlerin gerçek kopyaları bulunmaz; bunun yerine kök dizindeki ana depoya yönlendiren **sembolik linkler (kısayollar)** bulunur. Bu, diskten tasarruf sağlar ve kurulumları hızlandırır.
+- **[x] Kök `package.json`'ın Rolü ("Orkestra Şefi"):**
+    - **Öğrenildi mi?** Evet.
+    - **Notlar:** Projenin kök dizinindeki `package.json` dosyası, tüm projeyi yöneten merkezi komutları içerir. `pnpm --filter <klasör>` sözdizimi, komutun hangi alt projede çalışacağını belirtir. Örneğin, `pnpm dev` komutu hem `backend` hem de `frontend`'in `dev` script'lerini aynı anda çalıştırır.
+- **[x] `.npmrc` ve `store-dir` Yapılandırması:**
+    - **Öğrenildi mi?** Evet.
+    - **Notlar:** `.npmrc` dosyası, `pnpm`'in davranışlarını yapılandırır. `store-dir=.pnpm-store` ayarı, `pnpm`'e bağımlılıkları bilgisayarın genel bir deposuna değil, projenin kök dizininde oluşturulacak olan `.pnpm-store` klasörüne indirmesini söyler. Bu, "Unexpected store location" hatasını çözer ve projenin taşınabilirliğini ve tutarlılığını artırır.
 
 ## 4. Frontend Geliştirme
 

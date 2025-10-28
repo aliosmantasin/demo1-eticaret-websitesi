@@ -3,7 +3,7 @@ import { authRouter } from './api/auth/auth.controller';
 import { productsRouter } from './api/products/products.controller';
 
 const app = express();
-const port = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
 
@@ -29,6 +29,6 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   });
 });
 
-app.listen(port, () => {
-  console.log(`Backend server is running at http://localhost:${port}`);
+app.listen(PORT, () => {
+  console.log(`Backend server is running at http://localhost:${PORT}`);
 });

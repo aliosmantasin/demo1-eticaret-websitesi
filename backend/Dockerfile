@@ -17,6 +17,16 @@ COPY backend/package.json ./backend/package.json
 # Ana (root) package.json dosyasını kopyala
 COPY package.json ./
 
+# Bağımlılıkları yüklemeden önce package.json dosyalarını kopyala
+COPY pnpm-lock.yaml ./
+COPY .npmrc ./
+
+# Önce tüm proje kaynak kodunu kopyala
+COPY . .
+
+# pnpm için ortam değişkenini ayarla
+ENV CI=true
+
 # Tüm bağımlılıkları yükle (pnpm workspace'i tanıyacak)
 RUN pnpm install
 

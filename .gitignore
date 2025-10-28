@@ -11,10 +11,18 @@ coverage/
 # Docker
 docker-compose.override.yml
 
-# Env files
+# Environment files
 .env
 .env*.local
+.env.development.local
 !.env.example
+
+# local env files
+.env.local
+.env*.local
+
+# vercel
+.vercel
 
 # OS generated files
 .DS_Store
@@ -44,3 +52,7 @@ pnpm-debug.log*
 *.webp
 *.mp4
 *.webm
+
+# docs 
+docs/learnin.md
+docs/TASK.md

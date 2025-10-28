@@ -25,8 +25,10 @@ services:
       - "5001:5000"
     volumes:
       - ./backend:/usr/src/app/backend
+      # node_modules'ü host makineden mount etme, konteyner içindekini kullan
+      - /usr/src/app/backend/node_modules
     environment:
-      DATABASE_URL: postgresql://admin:password123@postgres:5432/ecom_db
+      - DATABASE_URL=${DATABASE_URL}
     depends_on:
       - postgres
     restart: unless-stopped
@@ -42,7 +44,10 @@ services:
       - "3000:3000"
     volumes:
       - ./frontend:/usr/src/app/frontend
-      - /usr/src/app/.next
+      # node_modules'ü host makineden mount etme, konteyner içindekini kullan
+      - /usr/src/app/frontend/node_modules
+    environment:
+      - NEXT_PUBLIC_API_URL=http://backend:5000
     depends_on:
       - backend
     restart: unless-stopped

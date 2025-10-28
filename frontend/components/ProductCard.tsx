@@ -1,6 +1,7 @@
 // frontend/components/ProductCard.tsx
 import { Star } from 'lucide-react';
 import { Product } from '@/types';
+import Image from 'next/image';
 
 interface ProductCardProps {
   product: Product;
@@ -23,58 +24,60 @@ const renderStars = (rating: number) => {
 };
 
 
-const ProductCard = ({ product }: ProductCardProps) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const hasDiscount = product.discounted_price && product.discounted_price < product.price;
 
   return (
-    <div className="border rounded-lg shadow-lg flex flex-col h-full group overflow-hidden">
-      <div className="relative w-full h-48 mb-2">
+    <div className="flex h-full flex-col rounded-lg transition-shadow duration-300 ">
+      <div className="relative mb-2 h-48 w-full">
         {product.images && product.images[0] ? (
-          <img
+          <Image
             src={product.images[0]}
+            width={400}
+            height={300}
             alt={product.name}
-            className="w-full h-full object-contain rounded-t-lg transition-transform duration-300 group-hover:scale-105"
+            className="h-full w-full rounded-t-lg object-contain cursor-pointer"
           />
         ) : (
-          <div className="w-full h-full bg-gray-200 rounded-t-lg"></div>
+          <div className="h-full w-full rounded-t-lg bg-gray-200"></div>
         )}
         {hasDiscount && (
-           <div className="absolute top-2 left-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">
-            %{product.discount_percentage} İndirim
+          <div className="absolute -top-3 right-2 flex h-16 w-16 items-center justify-center rounded bg-red-600 px-2 py-1 text-xs font-bold text-white">
+            <div className="flex flex-col items-center justify-center">
+              <span>%{product.discount_percentage}</span>
+              <span>İndirim</span>
+            </div>
           </div>
         )}
       </div>
-      <div className="p-4 flex flex-col flex-grow">
-        <h2 className="text-base font-semibold flex-grow mb-2 text-gray-800">{product.name}</h2>
-        
-        <div className="flex items-center gap-2 mb-2">
-           <div className="flex">
+      <div className="flex grow flex-col items-center justify-center p-4">
+        <h2 className="mb-2 grow text-center text-base font-semibold text-gray-800">{product.name}</h2>
+        <div className="mb-2 flex items-center gap-2">
+          <div className="flex">
             {renderStars(product.average_star)}
           </div>
-          <span className="text-xs text-gray-500">
-            {product.comment_count} yorum
-          </span>
         </div>
-
+        <span className="text-xs text-gray-500">
+          {product.comment_count} yorum
+        </span>
         <div className="mt-auto">
           {hasDiscount ? (
             <div className="flex items-end gap-2">
-              <p className="text-sm text-gray-500 line-through">
+             
+              <p className="text-md text-gray-500">
                 {product.price.toFixed(2)} TL
               </p>
-              <p className="text-xl font-bold text-red-600">
+
+              <p className="text-sm text-red-600 line-through">
                 {product.discounted_price?.toFixed(2)} TL
               </p>
+
             </div>
           ) : (
-            <p className="text-xl font-bold text-gray-900">
+            <p className="text-md  text-gray-900">
               {product.price.toFixed(2)} TL
             </p>
           )}
-
-          <button className="mt-4 w-full bg-gray-800 text-white py-2 rounded-lg font-semibold hover:bg-gray-900 transition-colors">
-            İncele
-          </button>
         </div>
       </div>
     </div>
@@ -82,3 +85,4 @@ const ProductCard = ({ product }: ProductCardProps) => {
 };
 
 export default ProductCard;
+
