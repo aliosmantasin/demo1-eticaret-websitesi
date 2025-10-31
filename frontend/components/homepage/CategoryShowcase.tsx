@@ -5,29 +5,35 @@ import Image from "next/image";
 const categories = [
     {
         name: "PROTEİN",
+        slug: "protein",
         image: "https://vr3j8vmadakibxk6.public.blob.vercel-storage.com/e-tic/ProteinCategories.webp",
     },
     {
         name: "VİTAMİNLER",
+        slug: "vitamin",
         image: "https://vr3j8vmadakibxk6.public.blob.vercel-storage.com/e-tic/VitaminCategories.webp",
     },
    
     {
         name: "SAĞLIK",
+        slug: "saglik",
         image: "https://vr3j8vmadakibxk6.public.blob.vercel-storage.com/e-tic/SaglikCategories.webp",
     },
 
     {
         name: "SPOR GIDALARI",
+        slug: "spor-gidalari",
         image: "https://vr3j8vmadakibxk6.public.blob.vercel-storage.com/e-tic/GidaCategories.webp",
     },
     {
         name: "GIDA",
+        slug: "gida",
         image: "https://vr3j8vmadakibxk6.public.blob.vercel-storage.com/e-tic/GidaCategories.webp",
     },
  
     {
         name: "TÜM ÜRÜNLER",
+        slug: "tum-urunler",
         image: "https://vr3j8vmadakibxk6.public.blob.vercel-storage.com/e-tic/TumUrun.webp",
     },
 ];
@@ -59,7 +65,7 @@ export function CategoryShowcase() {
                             {/* İNCELE Butonu */}
                             <div className="flex justify-end">
                             <a
-                                href={`/kategoriler/${category.name.toLowerCase().replace(/\s+/g, "-")}`}
+                                href={`/kategori/${category.slug}`}
                                 className="w-20 sm:w-auto xl:w-36 text-center bg-primary text-white px-4 md:px-4  rounded-md text-xs md:text-lg font-medium hover:bg-opacity-90 transition-all"
                             >
                                 İNCELE

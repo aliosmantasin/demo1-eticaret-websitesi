@@ -69,13 +69,18 @@ const Footer = () => {
                         </div>
                         <LinkList links={kurumsalLinks} />
                     </div>
-                    <div>
+                    <div className="flex justify-center">
+                        <div>
                         <h3 className="mb-6 text-xl font-bold text-white">Kategoriler</h3>
                         <LinkList links={kategoriLinks} />
+                        </div>
+                       
                     </div>
-                    <div>
+                    <div className=" flex justify-end">
+                        <div>
                         <h3 className="mb-6 text-xl font-bold text-white">Popüler Ürünler</h3>
                         <LinkList links={populerUrunLinks} />
+                        </div>
                     </div>
                 </div>
 

@@ -27,8 +27,9 @@ ENV CI=true
 # Tüm bağımlılıkları yükle (pnpm workspace'i tanıyacak)
 RUN pnpm install
 
-# Next.js uygulamasını build et
-RUN pnpm --filter "./frontend" build
+# GELİŞTİRME ORTAMI İÇİN BU ADIMI KALDIRIYORUZ.
+# Build işlemi, sadece production'a çıkarken gereklidir.
+# RUN pnpm --filter "./frontend" build
 
 # Çalışma dizinini frontend olarak ayarla
 WORKDIR /usr/src/app/frontend

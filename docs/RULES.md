@@ -67,6 +67,10 @@ docs(readme): update setup instructions
 - **Öğrenme Süreci:** Bu proje aynı zamanda bir öğrenme sürecidir. `docs/learnin.md` dosyası, öğrenilen yeni konuları ve aşılan zorlukları kaydetmek için aktif olarak kullanılacaktır.
 - **Onay Mekanizması:** Bir görev tamamlandığında, bir sonraki göreve geçmeden önce kullanıcı onayı alınacaktır.
 
-## 6. Dokümantasyon Kuralları
+### 6. Yapay Zeka (AI) ile Çalışma Kuralları
+
+- **Öğrenme Süreci Takibi:** AI, `docs/learnin.md` dosyasında "Geliştirilecek Alanlar" olarak belirtilen konularla ilgili bir kodlama yaptığında, görevin sonunda kullanıcıya bu konuyu anlayıp anlamadığını soracaktır. Amaç, sadece kodu tamamlamak değil, aynı zamanda kullanıcının bu süreçte teknik olarak gelişimini sağlamaktır.
+
+## 7. Dokümantasyon Kuralları
 
 - **Komutların Belgelenmesi:** Projede kullanılan, özellikle kurulum, veritabanı yönetimi ve build süreçleri gibi kritik işlemlere ait tüm komutlar `docs/COMMANDS.md` dosyasında belgelenmelidir. Her komutun ne işe yaradığı, hangi parametreleri aldığı ve ne zaman kullanılması gerektiği net bir şekilde açıklanmalıdır.

@@ -77,3 +77,42 @@ Bu doküman, proje geliştirme sürecinde öğrenilen konuları, karşılaşıla
 ## 4. Frontend Geliştirme
 
 *Bu bölüme frontend ile ilgili öğrenilen konular eklenecektir.*
+
+### Geliştirilecek Alanlar ve Odak Konuları
+
+-   **Component'ler Arası Veri Aktarımı (Props):**
+    -   **Durum:** Bir parent component'ten child component'e veri (`props`) aktarma mantığı henüz tam oturmadı. Özellikle birden fazla seviyede (parent -> child -> grandchild) veri aktarımının (prop drilling) ne zaman sorun olabileceği ve bu durumu yönetme stratejileri (Context API, State Management) pratikle pekiştirilmeli.
+    -   **Hedef:** Bir component'in ihtiyaç duyduğu veriyi nasıl ve nereden alması gerektiğine sezgisel olarak karar verebilmek. `Bestsellers` component'ine `products` listesinin nasıl aktarıldığını ve `ProductCard`'ın bu listeden tek bir `product`'ı nasıl aldığını tekrar incelemek.
+
+-   **Koşullu Render (Conditional Rendering) Mantığı:**
+    -   **Durum:** JavaScript operatörleri (üçlü operatör `? :`, mantıksal AND `&&`) kullanarak JSX içinde dinamik olarak bir şeyi gösterme veya gizleme konusunda pratik eksikliği var. Örneğin, bir üründe indirim varsa indirimli fiyatı, yoksa normal fiyatı gösterme gibi senaryoları koda dökmekte zorlanılıyor.
+    -   **Hedef:** Verinin durumuna göre farklı UI elemanları gösterme mantığını kavramak. `ProductCard` bileşenindeki `hasDiscount` kontrolü ve buna bağlı olarak farklı fiyatların nasıl render edildiği gibi örnekleri analiz ederek bu yapıları kendi başına kurabilme yeteneği kazanmak.
+
+## Postman Koleksiyonunu Anlamak ve Kullanmak
+
+Projemizin yol haritasını ve teknik gereksinimlerini anlamak için bize bir Postman koleksiyonu verildi. Bu koleksiyon, backend API'mız için bir kılavuz niteliğindedir.
+
+- **Postman URL'i:** `https://import.cdn.thinkific.com/871167/BkNjMszqTVOpBOi1vMiV_OJS%20Nutrition.postman_collection.json`
+
+### Bu Koleksiyon Ne İşe Yarar?
+
+Bu koleksiyon, projemizin backend'i için bir "teknik şartname" gibidir. Bize aşağıdaki bilgileri verir:
+
+1.  **API Endpoints (Uç Noktalar):** Hangi URL'lerin ne işe yaradığını gösterir. Örnek:
+    *   `GET /api/v1/products`: Tüm ürünleri listeler.
+    *   `POST /api/v1/auth/register`: Yeni bir kullanıcı kaydeder.
+    *   `POST /api/v1/users/cart`: Kullanıcının sepetine ürün ekler.
+
+2.  **Veri Yapıları (Data Structures):** Bir ürünün hangi alanları içerdiğini (`name`, `price_info`, `photo_src` vb.), bir kullanıcı kaydının nasıl olması gerektiğini (`email`, `password`, `first_name` vb.) net bir şekilde tanımlar.
+
+3.  **İstek ve Cevap Formatları:** API'ye hangi formatta veri göndermemiz (Request Body) ve API'den hangi formatta bir cevap beklememiz (Response) gerektiğini belirtir.
+
+### Bu Bilgilerle Neler Yapabiliriz?
+
+1.  **Veritabanı Şemasını Şekillendirme:** Postman'deki ürün, kategori, kullanıcı gibi veri yapılarına bakarak `backend/prisma/schema.prisma` dosyamızı doğru bir şekilde oluşturabilir ve güncelleyebiliriz. Ürün görsellerinin tam URL'lerini bu koleksiyondan alarak `seed.ts` dosyamızı düzelttik.
+
+2.  **Backend API Geliştirme:** `backend/src/api` klasörümüzdeki controller ve service dosyalarını bu kılavuza göre yazabiliriz. Örneğin, `products.service.ts` içinde kategoriye göre filtreleme yapmamız gerektiğini bu koleksiyondan anlıyoruz.
+
+3.  **Frontend-Backend Entegrasyonu:** `frontend`'de bir API isteği yapacağımız zaman (örneğin ürünleri çekerken), hangi URL'ye istek atacağımızı ve gelen verinin hangi alanları içereceğini bu koleksiyona bakarak biliriz.
+
+4.  **Yol Haritası Çıkarma:** Bu koleksiyon, projenin sadece mevcut ürün listeleme özelliğini değil, aynı zamanda **Kullanıcı Girişi**, **Sepet İşlemleri** ve **Sipariş Verme** gibi gelecekteki özelliklerini de tanımlıyor. Bu da bize projenin geri kalanı için net bir yol haritası sunuyor.

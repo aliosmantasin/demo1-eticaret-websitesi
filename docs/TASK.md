@@ -67,7 +67,40 @@ Bu liste, projenin MVP (Minimum Uygulanabilir Ürün) hedefine ulaşmak için ta
 - [x] **Görev 3.5: "Yeni Ürün Oluştur" Endpoint'inin Oluşturulması**
   - **Açıklama:** `/api/products` adresine gelen `POST` istekleriyle (doğrulanmış veri ile) yeni bir ürün oluşturan bir endpoint yazmak. Bu endpoint'in sadece admin gibi yetkili kullanıcılar tarafından erişilebilir olması gerekecek (şimdilik bu kuralı atlayabiliriz).
 
-## Faz 4: Frontend - Ana Sayfa
+## Faz 4: Frontend - Ürün Keşfi (Anasayfa ve Kategori Sayfası)
 
-- [ ] **Görev 4.1: 'Çok Satanlar' Bölümünün Oluşturulması**
-  - **Açıklama:** API'dan çekilen ürün verilerini, referans tasarıma uygun şekilde ana sayfada "Çok Satanlar" başlığı altında listelemek. İlk adımda temel ürün bilgilerini (resim, isim, fiyat) gösteren bir ürün kartı bileşeni oluşturulacak.
+- [x] **Görev 4.1: Frontend Anasayfa UI'ının Oluşturulması**
+  - **Açıklama:** Referans tasarıma uygun olarak, anasayfayı oluşturan tüm bileşenlerin (Header, Footer, Banner, CategoryShowcase, Bestsellers, Reviews, Assurance) oluşturulması ve yerleştirilmesi.
+  - **Detaylar:** Header ve Footer, tüm cihazlar için responsive (masaüstü menü, mobil sheet/accordion) olarak tamamlandı.
+- [x] **Görev 4.2: Dinamik Kategori Sayfa Altyapısının Kurulması**
+  - **Açıklama:** `/kategori/[slug]` dinamik route'u oluşturuldu. Bu sayfa, URL'deki `slug`'a göre kategori başlığını dinamik olarak gösterir.
+- [x] **Görev 4.3: Kategori Sayfası UI'ının Oluşturulması**
+  - **Açıklama:** Referans tasarıma uygun olarak kategori sayfasında `CategoryNavbar`, `InfoBanner` ve ürün listesi alanları oluşturuldu.
+
+## Faz 5: Veritabanı - Başlangıç Verilerinin Yüklenmesi (Seeding)
+
+- [ ] **Görev 5.1: `seed.ts` Dosyasının Postman Verileriyle Doldurulması**
+  - **Açıklama:** Sağlanan Postman koleksiyonundaki ürün ve kategori verilerini `prisma/seed.ts` dosyasına aktarmak. Bu, `pnpm prisma db seed` komutu çalıştırıldığında geliştirme veritabanının tutarlı ve gerçekçi verilerle dolmasını sağlayacak.
+- [ ] **Görev 5.2: Backend Kategori Filtrelemesinin Tamamlanması**
+  - **Açıklama:** Postman koleksiyonunda belirtildiği gibi, `/api/products` endpoint'inin `?category=[slug]` parametresini kabul edecek şekilde backend'de `products.service.ts` dosyasını güncellemek.
+
+## Faz 6: Frontend & Backend - Kullanıcı Kimlik Doğrulama
+
+- [ ] **Görev 6.1: Frontend'de Üye Ol Sayfası UI'ını Oluşturmak**
+- [ ] **Görev 6.2: Frontend'de Giriş Yap Sayfası UI'ını Oluşturmak**
+- [ ] **Görev 6.3: Frontend'den Register ve Login API İsteklerini Göndermek**
+- [ ] **Görev 6.4: Alınan JWT'yi Frontend'de Saklamak ve Yönetmek (Context API)**
+
+## Faz 7: Admin Paneli ve Ürün Yönetimi
+
+- [ ] **Görev 7.1: Prisma Şemasına Kullanıcı Rolü (Admin/User) Eklemek**
+- [ ] **Görev 7.2: Backend'de Admin Yetki Kontrolü (Middleware) Yazmak**
+- [ ] **Görev 7.3: Frontend'de Temel Bir Admin Paneli Arayüzü Oluşturmak**
+- [ ] **Görev 7.4: Admin Panelinde Ürün Ekleme/Düzenleme/Silme (CRUD) Fonksiyonlarını Eklemek**
+
+## Faz 8: Alışveriş Sepeti
+
+- [ ] **Görev 8.1: Prisma Şemasına `Cart` ve `CartItem` Modellerini Eklemek**
+- [ ] **Görev 8.2: Backend'de Sepete Ekleme/Güncelleme/Silme API Endpoint'lerini Yazmak**
+- [ ] **Görev 8.3: Frontend'de "Sepete Ekle" Butonlarını İşlevsel Hale Getirmek**
+- [ ] **Görev 8.4: Frontend'de Sepet İçeriğini Gösteren Bir Sayfa veya Drawer Oluşturmak**

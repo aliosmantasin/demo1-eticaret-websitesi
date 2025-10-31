@@ -1,13 +1,15 @@
 // frontend/types/index.ts
 
 export interface Category {
-  id: number;
+  id: string; // updated to match backend schema (cuid string)
   name: string;
+  slug: string; // new field
 }
 
 export interface Product {
-  id: number;
+  id: string; // updated to match backend schema
   name: string;
+  slug: string; // new field
   price: number;
   images: string[];
   category: Category;

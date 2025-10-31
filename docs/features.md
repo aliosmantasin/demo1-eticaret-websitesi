@@ -11,10 +11,11 @@ Bu doküman, PRD'de belirtilen özellikleri kullanıcı hikayeleri (User Stories
 - **Bir kullanıcı olarak,** şifremi unuttuğumda sıfırlama talebi gönderebilmeliyim.
 
 ### Ürün Kataloğu
-- **Bir kullanıcı olarak,** tüm ürünlerin listelendiği bir sayfayı gezebilmeliyim ki ne gibi ürünler olduğunu görebileyim.
-- **Bir kullanıcı olarak,** ürünleri kategoriye, fiyata veya popülerliğe göre filtreleyip sıralayabilmeliyim ki aradığımı kolayca bulabileyim.
-- **Bir kullanıcı olarak,** ilgimi çeken bir ürünün detaylarını (açıklama, görseller, fiyat) görmek için detay sayfasına gidebilmeliyim.
-- **Bir kullanıcı olarak,** anahtar kelimelerle ürün araması yapabilmeliyim.
+- [x] **Bir kullanıcı olarak,** anasayfadaki banner, kategoriler ve çok satanlar gibi bölümleri görerek siteyi keşfedebilmeliyim.
+- [x] **Bir kullanıcı olarak,** tüm ürünlerin listelendiği bir sayfayı gezebilmeliyim ki ne gibi ürünler olduğunu görebileyim.
+- [ ] **Bir kullanıcı olarak,** ürünleri kategoriye, fiyata veya popülerliğe göre filtreleyip sıralayabilmeliyim ki aradığımı kolayca bulabileyim.
+- [ ] **Bir kullanıcı olarak,** ilgimi çeken bir ürünün detaylarını (açıklama, görseller, fiyat) görmek için detay sayfasına gidebilmeliyim.
+- [ ] **Bir kullanıcı olarak,** anahtar kelimelerle ürün araması yapabilmeliyim.
 
 ### Alışveriş Sepeti ve Sipariş
 - **Bir kullanıcı olarak,** ürün detay sayfasından veya ürün listesinden sepete ürün ekleyebilmeliyim.

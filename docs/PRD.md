@@ -26,15 +26,16 @@ Bu doküman, geliştirilecek olan E-Ticaret Platformu'nun hedeflerini, özellikl
 
 ## 4. Özellikler ve Gereksinimler (MVP Kapsamı)
 
-### 4.1. Kullanıcı Kimlik Doğrulama
-- E-posta ve şifre ile kayıt olma.
+### 4.1. Ürün Kataloğu ve Keşif (Tamamlandı)
+- **Anasayfa:** Banner, kategori tanıtımları, çok satan ürünler gibi dinamik modüllerin yer aldığı vitrin sayfası.
+- **Ürün Listeleme:** Ürünlerin kategori bazında listelendiği sayfalar (sayfalama, sıralama, filtreleme).
+- **Ürün Detay:** Tek bir ürünün tüm bilgilerinin (açıklama, görseller, fiyat) görüntülendiği sayfa.
+- **Ürün Arama:** Kullanıcıların anahtar kelime ile ürün araması yapabilmesi.
+
+### 4.2. Kullanıcı Kimlik Doğrulama
+- E-posta ve şifre ile yeni kullanıcı kaydı oluşturma.
 - Giriş yapma ve oturumu yönetme (JWT).
 - Şifre sıfırlama (opsiyonel).
-
-### 4.2. Ürün Kataloğu
-- Ürünleri listeleme (sayfalama, sıralama, filtreleme).
-- Ürün detay sayfasını görüntüleme.
-- Ürün arama.
 
 ### 4.3. Alışveriş Sepeti
 - Sepete ürün ekleme/çıkarma.

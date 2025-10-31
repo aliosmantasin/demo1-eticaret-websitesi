@@ -23,28 +23,31 @@ model User {
 }
 
 model Category {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   name      String   @unique
+  slug      String   @unique
   products  Product[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Product {
-  id                 Int      @id @default(autoincrement())
+  id                 String   @id @default(cuid())
   name               String
+  slug               String   @unique
   description        String?
   short_explanation  String?  // Yeni alan
   price              Float
   discounted_price   Float?   // Yeni alan
   discount_percentage Int?    // Yeni alan
   stock              Int      @default(0)
+  isBestseller       Boolean  @default(false)
   images             String[]
   comment_count      Int      @default(0) // Yeni alan
   average_star       Float    @default(0) // Yeni alan
 
   category   Category @relation(fields: [categoryId], references: [id])
-  categoryId Int
+  categoryId String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
