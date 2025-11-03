@@ -56,3 +56,15 @@ pnpm-debug.log*
 # docs 
 docs/learnin.md
 docs/TASK.md
+docs/HowToMade/AUTHENTICATION.md
+docs/HowToMade/CART.md
+docs/HowToMade/ADMIN_PANEL.md
+docs/HowToMade/PRODUCT_REVIEWS.md
+docs/HowToMade/ACCOUNT_MANAGEMENT.md
+docs/COMMANDS.md
+docs/DEPLOYMENT.md
+docs/DEPLOYMENT_GUIDE.md
+docs/RULES.md
+docs/features.md
+docs/PRD.md
+

@@ -12,8 +12,13 @@ const PORT = process.env.PORT || 5000;
 
 // CORS Middleware'ini ekliyoruz
 // Frontend'in çalıştığı adresten gelen isteklere izin ver
+const allowedOrigins = process.env.FRONTEND_URL 
+  ? [process.env.FRONTEND_URL] 
+  : ['http://localhost:3000'];
+
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: allowedOrigins,
+  credentials: true,
 }));
 
 app.use(express.json());
