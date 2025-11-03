@@ -22,9 +22,9 @@ async function getProducts(slug: string): Promise<Product[]> {
     }
 }
 
-// Tip tanımını en sade ve doğru haline geri getiriyoruz.
-export default async function CategoryPage({ params }: { params: { slug: string } }) {
-    const { slug } = params;
+// Next.js 15+ için, `params` objesi asenkron olduğundan önce `await` ile çözülmelidir.
+export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = await params;
     if (!slug) {
         // Handle the case where slug is not present, e.g., return a 404 page or default content
         return <div>Kategori bulunamadı.</div>;

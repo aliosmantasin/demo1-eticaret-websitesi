@@ -18,4 +18,25 @@ export interface Product {
   discount_percentage: number | null;
   comment_count: number;
   average_star: number;
+  stock?: number; // Yeni alan
+  description?: string | null; // Yeni alan
+}
+
+export interface User {
+  id: string;
+  firstName: string | null;
+  lastName: string | null;
+  email: string;
+}
+
+export interface Review {
+  id: string;
+  userId: string;
+  productId: string;
+  rating: number; // 1-5
+  title: string | null;
+  comment: string;
+  createdAt: string;
+  updatedAt: string;
+  user: User;
 }

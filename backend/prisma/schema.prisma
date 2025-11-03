@@ -14,12 +14,17 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   email     String   @unique
   password  String
-  name      String?
+  firstName String?
+  lastName  String?
+  role      String   @default("USER") // USER veya ADMIN
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  
+  cart      Cart?     // Her kullanıcının tek bir sepeti olacak
+  reviews   Review[]  // Kullanıcının yorumları
 }
 
 model Category {
@@ -50,4 +55,47 @@ model Product {
   categoryId String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+  
+  cartItems  CartItem[]  // Sepet öğeleri
+  reviews    Review[]    // Ürün yorumları
+}
+
+model Cart {
+  id        String      @id @default(cuid())
+  userId    String      @unique
+  items     CartItem[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  cartId    String
+  productId String
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id])
+  
+  @@unique([cartId, productId])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  rating    Int      // 1-5 arası yıldız puanı
+  title     String?  // Yorum başlığı
+  comment   String   // Yorum metni
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, productId]) // Her kullanıcı bir ürün için tek yorum yapabilir
 }

@@ -13,13 +13,13 @@ const Footer = () => {
     const kurumsalLinks = [
         { href: "/iletisim", label: "İletişim" },
         { href: "/hakkimizda", label: "Hakkımızda" },
-        { href: "/sikca-sorulan-sorular", label: "Sıkça Sorulan Sorular" },
-        { href: "/kvkk", label: "KVKK" },
-        { href: "/calisma-ilkelerimiz", label: "Çalışma İlkelerimiz" },
-        { href: "/satis-sozlesmesi", label: "Satış Sözleşmesi" },
-        { href: "/garanti-ve-iade-kosullari", label: "Garanti ve İade Koşulları" },
-        { href: "/gercek-musteri-yorumlari", label: "Gerçek Müşteri Yorumları" },
-        { href: "/blog", label: "Blog" },
+        { href: "/sss", label: "Sıkça Sorulan Sorular" },
+        { href: "#", label: "KVKK" },
+        { href: "#", label: "Çalışma İlkelerimiz" },
+        { href: "#", label: "Satış Sözleşmesi" },
+        { href: "#", label: "Garanti ve İade Koşulları" },
+        { href: "#", label: "Gerçek Müşteri Yorumları" },
+        { href: "#", label: "Blog" },
     ];
 
     const kategoriLinks = [

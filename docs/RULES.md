@@ -74,3 +74,7 @@ docs(readme): update setup instructions
 ## 7. Dokümantasyon Kuralları
 
 - **Komutların Belgelenmesi:** Projede kullanılan, özellikle kurulum, veritabanı yönetimi ve build süreçleri gibi kritik işlemlere ait tüm komutlar `docs/COMMANDS.md` dosyasında belgelenmelidir. Her komutun ne işe yaradığı, hangi parametreleri aldığı ve ne zaman kullanılması gerektiği net bir şekilde açıklanmalıdır.
+
+## 8. Hata Çözme Stratejisi
+
+- **Önce Resmi Dokümantasyon:** Bir teknolojiye (Next.js, Docker, Prisma vb.) özgü, inatçı veya anlaşılması zor bir hatayla karşılaşıldığında, deneme-yanılma yöntemlerine başvurmadan önce ilk adım her zaman o teknolojinin **resmi dokümantasyonunu** veya hata mesajında belirtilen linki incelemek olmalıdır. Bu, en doğru ve güncel çözüme en hızlı şekilde ulaşmayı sağlar.

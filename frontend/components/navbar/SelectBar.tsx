@@ -1,7 +1,21 @@
+'use client';
 
+import { useRouter } from 'next/navigation';
 import * as React from "react";
 
 export function SelectBar() {
+  const router = useRouter();
+
+  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = event.target.value;
+    if (value === 'GirisYap') {
+      router.push('/giris-yap');
+    } else if (value === 'KayitOl') {
+      router.push('/kayit-ol');
+    }
+    event.target.value = "";
+  };
+
   return (
     <div className="relative h-12 w-36 lg:w-46">
       {/* Person Icon */}
@@ -21,12 +35,13 @@ export function SelectBar() {
       <select
         id="account-select"
         className="h-12 w-full appearance-none rounded-lg border-2 border-gray-300 bg-transparent pl-12 pr-8 font-medium text-gray-900 focus:border-gray-500 focus:outline-none"
-        defaultValue=""
+        onChange={handleChange}
+        value=""
       >
         <option value="" disabled>
           HESAP
         </option>
-        <option value="GirisYap">Giriş</option>
+        <option value="GirisYap">Giriş Yap</option>
         <option value="KayitOl">Kayıt Ol</option>
       </select>
 

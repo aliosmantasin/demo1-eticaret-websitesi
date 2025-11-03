@@ -1,6 +1,9 @@
 import { Breadcrumb } from "@/components/product-detail/Breadcrumb";
 import { ProductGallery } from "@/components/product-detail/ProductGallery";
 import { ProductInfo } from "@/components/product-detail/ProductInfo";
+import { ProductReviews } from "@/components/product-detail/ProductReviews";
+import { SimilarProducts } from "@/components/product-detail/SimilarProducts";
+import { Bestsellers } from "@/components/product-detail/Bestsellers";
 import { Product } from "@/types";
 import React from "react";
 
@@ -27,8 +30,8 @@ async function getProduct(slug: string): Promise<Product | null> {
 }
 
 
-export default async function ProductDetailPage({ params }: { params: { slug: string } }) {
-    const { slug } = params;
+export default async function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = await params;
     const product = await getProduct(slug);
 
     if (!product) {
@@ -57,8 +60,14 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
                     </div>
                 </div>
 
-           
-                {/* TODO: İlgili Ürünler buraya gelecek */}
+                {/* Benzer Ürünler */}
+                <SimilarProducts product={product} />
+
+                {/* Yorumlar Bölümü */}
+                <ProductReviews productId={product.id} />
+
+                {/* Çok Satanlar */}
+                <Bestsellers />
             </div>
         </div>
     );

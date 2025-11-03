@@ -37,5 +37,24 @@ Projenin Docker üzerinde çalıştırılmaya çalışıldığı sırada, saatle
 - **Neden:** `prisma/seed.ts` dosyasında, imajlar için `/assets/products/...` gibi yerel yollar tanımlanmıştı. Bu dosyalar fiziksel olarak projede olmadığı için tarayıcı resimleri bulamadı.
 - **Çözüm:** `seed.ts` dosyası, Postman koleksiyonunda belirtilen `https://fe1111.projects.academy.onlyjs.com/media/...` formatındaki tam ve ulaşılabilir URL'ler ile güncellendi ve `db seed` komutu tekrar çalıştırıldı.
 
+### Problem 4: Next.js 15 Asenkron `params` Hatası
+
+- **Hata Belirtisi:** Hibrit geliştirme modeline geçtikten sonra, `frontend`'in lokal sunucusu çalışmasına rağmen, dinamik sayfalara (`/urun/[slug]`, `/kategori/[slug]`) girildiğinde terminalde `Error: Route ... used params.slug. params should be awaited before using its properties.` hatası alınıyordu.
+- **Neden:** Next.js'in 15. versiyonu ile birlikte, sayfa bileşenlerine gelen `params` ve `searchParams` objeleri artık senkron (doğrudan erişilebilir) objeler değil, **asenkron `Promise`'lerdir**. Bu, Next.js'in render optimizasyonları için yaptığı bir değişikliktir. Bizim kodumuz ise, `params` objesini `await` ile beklemeden doğrudan içindeki `slug`'a erişmeye çalışıyordu.
+- **Çözüm:**
+    1.  **Teşhis:** Hata mesajındaki `Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis` linki incelenerek sorunun kaynağının Next.js 15 değişikliği olduğu anlaşıldı.
+    2.  **Kod Düzeltmesi:** İlgili tüm sayfa bileşenlerinde (`urun/[slug]/page.tsx` ve `kategori/[slug]/page.tsx`), `params` objesini kullanmadan önce `await` anahtar kelimesi ile "çözülmesi" sağlandı.
+
+        ```typescript
+        // ESKİ HATALI KOD
+        // export default async function Page({ params: { slug } }) { ... }
+
+        // YENİ VE DOĞRU KOD
+        export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
+            const { slug } = await params;
+            // ...
+        }
+        ```
+
 
 

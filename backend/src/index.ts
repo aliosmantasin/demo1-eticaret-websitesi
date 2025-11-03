@@ -1,19 +1,34 @@
 import express, { Request, Response, NextFunction } from 'express';
+import cors from 'cors';
 import { authRouter } from './api/auth/auth.controller';
 import { productsRouter } from './api/products/products.controller';
+import { cartRouter } from './api/cart/cart.controller';
+import { adminRouter } from './api/admin/admin.controller';
+import { categoriesRouter } from './api/categories/categories.controller';
+import { reviewsRouter } from './api/reviews/reviews.controller';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// CORS Middleware'ini ekliyoruz
+// Frontend'in çalıştığı adresten gelen isteklere izin ver
+app.use(cors({
+  origin: 'http://localhost:3000',
+}));
+
 app.use(express.json());
 
-app.get('/', (req: Request, res: Response) => {
+app.get('/api', (req: Request, res: Response) => {
   res.json({ message: 'Welcome to the E-Commerce API!' });
 });
 
 // API Routes
 app.use('/api/auth', authRouter);
 app.use('/api/products', productsRouter);
+app.use('/api/cart', cartRouter);
+app.use('/api/categories', categoriesRouter);
+app.use('/api/reviews', reviewsRouter);
+app.use('/api/admin', adminRouter);
 
 // Basic Error Handler
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

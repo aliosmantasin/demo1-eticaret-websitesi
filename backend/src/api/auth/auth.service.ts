@@ -2,9 +2,15 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import prisma from '../../core/services/prisma.service';
 import { z } from 'zod';
-import { RegisterSchema } from './auth.controller';
 
-type RegisterUserInput = z.infer<typeof RegisterSchema>;
+// Servisin ihtiyaç duyduğu veri yapısını tanımlıyoruz.
+// Bu, controller'daki Zod şemasından bağımsızdır.
+interface CreateUserInput {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+}
 
 // Extend LoginSchema to be used in the service
 const LoginSchema = z.object({
@@ -13,14 +19,28 @@ const LoginSchema = z.object({
 });
 type LoginUserInput = z.infer<typeof LoginSchema>;
 
-export const createUser = async (userData: RegisterUserInput) => {
-  const hashedPassword = await bcrypt.hash(userData.password, 10);
-  const userToCreate = {
-    ...userData,
-    password: hashedPassword,
-  };
+export const createUser = async (userData: CreateUserInput) => {
+  const { email, password, firstName, lastName } = userData;
+
+  // E-postanın zaten kayıtlı olup olmadığını kontrol et
+  const existingUser = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (existingUser) {
+    // Zaten kayıtlı bir e-posta varsa hata fırlat
+    throw new Error('This email is already registered.');
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+  
   const newUser = await prisma.user.create({
-    data: userToCreate,
+    data: {
+      email,
+      password: hashedPassword,
+      firstName,
+      lastName,
+    },
   });
   return newUser;
 };
@@ -48,4 +68,56 @@ export const loginUser = async (loginData: LoginUserInput) => {
   });
 
   return { token };
+};
+
+/**
+ * Kullanıcı bilgilerini getirir.
+ * Kullanım: JWT token'dan kullanıcı profilini çekmek.
+ * 
+ * @param userId - Kullanıcı ID'si
+ * @returns Kullanıcı bilgileri (şifre hariç)
+ */
+export const getUserById = async (userId: string) => {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      role: true,
+      createdAt: true,
+    },
+  });
+
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  return user;
+};
+
+/**
+ * Kullanıcı bilgilerini günceller.
+ * Kullanım: Profil sayfasında ad-soyad güncelleme işlemi.
+ * 
+ * @param userId - Güncellenecek kullanıcının ID'si
+ * @param updateData - Güncellenecek alanlar (firstName, lastName)
+ * @returns Güncellenmiş kullanıcı bilgileri (şifre hariç)
+ */
+export const updateUserProfile = async (userId: string, updateData: { firstName?: string; lastName?: string }) => {
+  const user = await prisma.user.update({
+    where: { id: userId },
+    data: updateData,
+    select: {
+      id: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      role: true,
+      createdAt: true,
+    },
+  });
+
+  return user;
 };

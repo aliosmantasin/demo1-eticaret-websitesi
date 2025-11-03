@@ -2,11 +2,23 @@
 
 import { Button } from '@/components/ui/button';
 import { Product } from '@/types';
-import { Minus, Plus, ShieldCheck, ShoppingCart, Star, Truck } from 'lucide-react';
+import { Minus, Plus, ShieldCheck, Star, Truck, CheckCircle } from 'lucide-react';
 import { VariantChip } from './VariantChip';
 import { SizeBox } from './SizeBox';
 import React, { useState } from 'react';
 import { ProductDetailsAccordion } from './ProductDetailsAccordion';
+import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import Image from 'next/image';
+import Link from 'next/link';
 
 interface ProductInfoProps {
     product: Product;
@@ -28,6 +40,12 @@ const renderStars = (average_star: number) => {
 
 export const ProductInfo: React.FC<ProductInfoProps> = ({ product }) => {
     const [quantity, setQuantity] = useState(1);
+    const [isAdding, setIsAdding] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [showErrorModal, setShowErrorModal] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+    const { token } = useAuth();
+    const router = useRouter();
     const hasDiscount = product.discounted_price && product.discounted_price < product.price;
 
     // TEMP: Sabit aromalar ve boyutlar (backend entegrasyonu sonrası product datasından gelecek)
@@ -52,6 +70,45 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({ product }) => {
     const [selectedSize, setSelectedSize] = useState(sizeOptions[0].size);
 
     const pricePerServing = ((hasDiscount ? product.discounted_price! : product.price) / 16).toFixed(2); // TODO dynamic serving
+
+    const handleAddToCart = async () => {
+        if (!token) {
+            router.push('/giris-yap');
+            return;
+        }
+
+        setIsAdding(true);
+        try {
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+            const response = await fetch(`${apiUrl}/api/cart/items`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    productId: product.id,
+                    quantity: quantity,
+                }),
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.message || 'Sepete eklenirken bir hata oluştu');
+            }
+
+            // Sepet güncellemesini tetikle
+            window.dispatchEvent(new CustomEvent('cartUpdated'));
+            
+            setShowSuccessModal(true);
+        } catch (error) {
+            console.error('Sepete ekleme hatası:', error);
+            setErrorMessage(error instanceof Error ? error.message : 'Ürün sepete eklenirken bir hata oluştu. Lütfen tekrar deneyin.');
+            setShowErrorModal(true);
+        } finally {
+            setIsAdding(false);
+        }
+    };
 
     return (
         <div className="flex flex-col gap-4">
@@ -141,13 +198,16 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({ product }) => {
                         <Plus className="h-4 w-4" />
                     </Button>
                 </div>
-                <Button size="lg" className="grow bg-primary  hover:bg-primary/90">
-                    
+                <Button 
+                    size="lg" 
+                    className="grow bg-primary hover:bg-primary/90"
+                    onClick={handleAddToCart}
+                    disabled={isAdding}
+                >
                     <svg className="text-3xl w-12 h-12" focusable="false" aria-hidden="true" viewBox="0 0 24 24" fill="currentColor" style={{width: '1.5rem', height: '1.5rem'}}>
                         <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2M1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2"></path>
                     </svg>
-
-                     <span>SEPETE EKLE</span>
+                    <span>{isAdding ? 'Ekleniyor...' : 'SEPETE EKLE'}</span>
                 </Button>
             </div>
 
@@ -188,7 +248,76 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({ product }) => {
                     <ProductDetailsAccordion />
                 </div>
 
+            {/* Başarı Modal */}
+            <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2 text-green-600">
+                            <CheckCircle className="h-6 w-6" />
+                            Ürün Sepete Eklendi
+                        </DialogTitle>
+                        <DialogDescription className="pt-4">
+                            <div className="flex gap-4 items-center">
+                                <div className="relative w-24 h-24 overflow-hidden rounded-md border border-gray-200 shrink-0">
+                                    <Image
+                                        src={product.images[0] || '/placeholder.png'}
+                                        alt={product.name}
+                                        fill
+                                        className="object-cover"
+                                    />
+                                </div>
+                                <div className="flex-1">
+                                    <p className="font-semibold text-gray-900">{product.name}</p>
+                                    <p className="text-sm text-gray-600 mt-1">
+                                        {quantity} adet sepete eklendi
+                                    </p>
+                                    {(hasDiscount ? product.discounted_price! : product.price) * quantity > 0 && (
+                                        <p className="text-lg font-bold text-green-600 mt-2">
+                                            {((hasDiscount ? product.discounted_price! : product.price) * quantity).toFixed(2)} ₺
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="flex gap-2 sm:gap-0">
+                        <Button
+                            variant="outline"
+                            onClick={() => setShowSuccessModal(false)}
+                            className="w-full sm:w-auto"
+                        >
+                            Alışverişe Devam Et
+                        </Button>
+                        <Link href="/sepet" onClick={() => setShowSuccessModal(false)} className="w-full sm:w-auto">
+                            <Button className="w-full sm:w-auto">
+                                Sepete Git
+                            </Button>
+                        </Link>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
+            {/* Hata Modal */}
+            <Dialog open={showErrorModal} onOpenChange={setShowErrorModal}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="text-red-600">
+                            Hata Oluştu
+                        </DialogTitle>
+                        <DialogDescription className="pt-4">
+                            {errorMessage}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button
+                            onClick={() => setShowErrorModal(false)}
+                            className="w-full sm:w-auto"
+                        >
+                            Tamam
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 };

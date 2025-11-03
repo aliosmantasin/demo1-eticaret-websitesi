@@ -79,28 +79,67 @@ Bu liste, projenin MVP (Minimum Uygulanabilir Ürün) hedefine ulaşmak için ta
 
 ## Faz 5: Veritabanı - Başlangıç Verilerinin Yüklenmesi (Seeding)
 
-- [ ] **Görev 5.1: `seed.ts` Dosyasının Postman Verileriyle Doldurulması**
+- [x] **Görev 5.1: `seed.ts` Dosyasının Postman Verileriyle Doldurulması**
   - **Açıklama:** Sağlanan Postman koleksiyonundaki ürün ve kategori verilerini `prisma/seed.ts` dosyasına aktarmak. Bu, `pnpm prisma db seed` komutu çalıştırıldığında geliştirme veritabanının tutarlı ve gerçekçi verilerle dolmasını sağlayacak.
-- [ ] **Görev 5.2: Backend Kategori Filtrelemesinin Tamamlanması**
+- [x] **Görev 5.2: Backend Kategori Filtrelemesinin Tamamlanması**
   - **Açıklama:** Postman koleksiyonunda belirtildiği gibi, `/api/products` endpoint'inin `?category=[slug]` parametresini kabul edecek şekilde backend'de `products.service.ts` dosyasını güncellemek.
 
 ## Faz 6: Frontend & Backend - Kullanıcı Kimlik Doğrulama
 
-- [ ] **Görev 6.1: Frontend'de Üye Ol Sayfası UI'ını Oluşturmak**
-- [ ] **Görev 6.2: Frontend'de Giriş Yap Sayfası UI'ını Oluşturmak**
-- [ ] **Görev 6.3: Frontend'den Register ve Login API İsteklerini Göndermek**
-- [ ] **Görev 6.4: Alınan JWT'yi Frontend'de Saklamak ve Yönetmek (Context API)**
+- [x] **Görev 6.1: Frontend'de Üye Ol Sayfası UI'ını Oluşturmak**
+- [x] **Görev 6.2: Frontend'de Giriş Yap Sayfası UI'ını Oluşturmak**
+- [x] **Görev 6.3: Frontend'den Register ve Login API İsteklerini Göndermek**
+- [x] **Görev 6.4: Alınan JWT'yi Frontend'de Saklamak ve Yönetmek (Context API)**
 
 ## Faz 7: Admin Paneli ve Ürün Yönetimi
 
-- [ ] **Görev 7.1: Prisma Şemasına Kullanıcı Rolü (Admin/User) Eklemek**
-- [ ] **Görev 7.2: Backend'de Admin Yetki Kontrolü (Middleware) Yazmak**
-- [ ] **Görev 7.3: Frontend'de Temel Bir Admin Paneli Arayüzü Oluşturmak**
-- [ ] **Görev 7.4: Admin Panelinde Ürün Ekleme/Düzenleme/Silme (CRUD) Fonksiyonlarını Eklemek**
+- [x] **Görev 7.1: Prisma Şemasına Kullanıcı Rolü (Admin/User) Eklemek**
+  - **Açıklama:** `User` modeline `role` alanı eklendi. Varsayılan değer "USER".
+- [x] **Görev 7.2: Backend'de Admin Yetki Kontrolü (Middleware) Yazmak**
+  - **Açıklama:** `requireAdmin` middleware'i oluşturuldu. Admin route'ları korunuyor.
+- [x] **Görev 7.3: Frontend'de Temel Bir Admin Paneli Arayüzü Oluşturmak**
+  - **Açıklama:** `/admin` sayfası oluşturuldu. Ürün listesi ve silme işlevi eklendi.
+- [x] **Görev 7.4: Admin Panelinde Ürün Ekleme/Düzenleme/Silme (CRUD) Fonksiyonlarını Eklemek**
+  - **Açıklama:** Backend ve frontend'de tam CRUD işlemleri tamamlandı. Form yapısı oluşturuldu.
 
 ## Faz 8: Alışveriş Sepeti
 
-- [ ] **Görev 8.1: Prisma Şemasına `Cart` ve `CartItem` Modellerini Eklemek**
-- [ ] **Görev 8.2: Backend'de Sepete Ekleme/Güncelleme/Silme API Endpoint'lerini Yazmak**
-- [ ] **Görev 8.3: Frontend'de "Sepete Ekle" Butonlarını İşlevsel Hale Getirmek**
-- [ ] **Görev 8.4: Frontend'de Sepet İçeriğini Gösteren Bir Sayfa veya Drawer Oluşturmak**
+- [x] **Görev 8.1: Prisma Şemasına `Cart` ve `CartItem` Modellerini Eklemek**
+- [x] **Görev 8.2: Backend'de Sepete Ekleme/Güncelleme/Silme API Endpoint'lerini Yazmak**
+- [x] **Görev 8.3: Frontend'de "Sepete Ekle" Butonlarını İşlevsel Hale Getirmek**
+- [x] **Görev 8.4: Frontend'de Sepet İçeriğini Gösteren Bir Sayfa veya Drawer Oluşturmak**
+
+## Faz 9: Ürün Detay Sayfası Geliştirmeleri
+
+- [x] **Görev 9.1: Ürün Yorumları Sistemi - Backend**
+  - **Açıklama:** `Review` modelini Prisma şemasına eklemek, yorum CRUD API'lerini oluşturmak. **Not:** MVP'de sipariş sistemi olmadığı için satın alma kontrolü yok.
+- [x] **Görev 9.2: Ürün Yorumları Sistemi - Frontend**
+  - **Açıklama:** Ürün detay sayfasına yorum gösterme ve yorum yapma özelliği eklemek.
+- [x] **Görev 9.3: Benzer Ürünler Bölümü**
+  - **Açıklama:** Ürün detay sayfasında "Son Görüntülenen Ürünler" yerine aynı kategorideki benzer ürünleri göstermek.
+- [x] **Görev 9.4: Çok Satanlar Bölümü**
+  - **Açıklama:** Ürün detay sayfasına `isBestseller` olarak işaretlenmiş ürünleri gösteren bir bölüm eklemek.
+
+## Faz 10: Kullanıcı Profili ve Sepet Sayfası
+
+- [x] **Görev 10.1: Kullanıcı Profil Sayfası**
+  - **Açıklama:** Kullanıcının bilgilerini görüntüleyip düzenleyebileceği bir sayfa oluşturmak.
+- [x] **Görev 10.2: Kullanıcı Bilgileri Güncelleme Backend**
+  - **Açıklama:** Profil güncelleme API'si oluşturmak.
+- [x] **Görev 10.3: Sepete Eklenen Ürünler Sayfası**
+  - **Açıklama:** Sepet sayfasını oluşturmak, CartDrawer'dan sepet sayfasına yönlendirme eklendi. Ürün ekleme ve silme işlemleri için modern modal dialogs eklendi.
+- [x] **Görev 10.4: Siparişlerim Sayfası**
+  - **Açıklama:** Mock data ile sipariş listesi sayfası oluşturuldu. MVP için backend entegrasyonu sonraya ertelendi.
+- [x] **Görev 10.5: Adreslerim Sayfası**
+  - **Açıklama:** Mock data ile adres yönetimi sayfası oluşturuldu. MVP için backend entegrasyonu sonraya ertelendi.
+
+## Faz 11: Ek Sayfalar ve İyileştirmeler
+
+- [x] **Görev 11.1: İletişim Sayfası**
+  - **Açıklama:** İletişim formu, telefon ve e-posta bilgileri, kargo bilgileri içeren sayfa oluşturuldu.
+- [x] **Görev 11.2: Hakkımızda Sayfası**
+  - **Açıklama:** Şirket misyonu, değerler, sertifikalar ve müşteri istatistikleri içeren sayfa oluşturuldu.
+- [x] **Görev 11.3: SSS (FAQ) Sayfası**
+  - **Açıklama:** Genel, Ürünler, Kargo kategorilerinde soru-cevap sayfası oluşturuldu.
+- [x] **Görev 11.4: Dokümantasyon Güncellemeleri**
+  - **Açıklama:** ACCOUNT_MANAGEMENT.md, DEPLOYMENT.md oluşturuldu, README.md güncellendi.

@@ -7,10 +7,12 @@ import {
     SheetTitle,
     SheetTrigger,
 } from "@/components/ui/sheet";
-import { ChevronRight, Menu } from "lucide-react";
+import { ChevronRight, Menu, LogOut, User,LogIn, UserPlus   } from "lucide-react";
+import Link from 'next/link';
 
-import { CartButton } from "./CartButton";
 import Logo from "./Logo";
+import { useAuth } from "@/context/AuthContext";
+import { CartDrawer } from "@/components/cart/CartDrawer";
 
 const categories = [
     { name: "PROTEİN" },
@@ -21,15 +23,16 @@ const categories = [
     { name: "TÜM ÜRÜNLER" },
 ];
 
-const links = [
-    { name: "HESABIM" },
-    { name: "MÜŞTERİ YORUMLARI" },
-    { name: "İLETİŞİM" },
-];
-
 export function HeaderMobil() {
+    const { token, logout } = useAuth();
+
+    const staticLinks = [
+        { name: "MÜŞTERİ YORUMLARI", href: "/yorumlar" },
+        { name: "İLETİŞİM", href: "/iletisim" },
+    ];
+    
     return (
-        <div className="flex items-center justify-between border-b p-4 md:hidden">
+        <div className="flex items-center justify-between border-b p-4 sm:hidden">
             <Sheet>
                 <SheetTrigger asChild>
                     <Menu className="h-6 w-6 cursor-pointer" />
@@ -45,26 +48,57 @@ export function HeaderMobil() {
                                     key={category.name}
                                     className="border-b border-gray-200"
                                 >
-                                    <a
+                                    <Link
                                         href="#"
                                         className="flex items-center justify-between p-4 text-sm font-medium"
                                     >
                                         {category.name}
                                         <ChevronRight className="h-5 w-5" />
-                                    </a>
+                                    </Link>
                                 </li>
                             ))}
                         </ul>
                         <div className="border-t border-gray-200 bg-gray-50">
                             <ul>
-                                {links.map((link) => (
+                                {token ? (
+                                    <>
+                                        <li key="hesabim">
+                                            <Link href="/hesabim" className="flex items-center p-4 text-sm font-medium text-gray-700">
+                                                <User className="mr-2 h-4 w-4" />
+                                                Hesabım
+                                            </Link>
+                                        </li>
+                                        <li key="cikis">
+                                            <button onClick={logout} className="flex w-full items-center p-4 text-sm font-medium text-red-500">
+                                                <LogOut className="mr-2 h-4 w-4" />
+                                                Çıkış Yap
+                                            </button>
+                                        </li>
+                                    </>
+                                ) : (
+                                    <>
+                                        <li key="giris">
+                                            <Link href="/giris-yap" className="flex items-center p-4 text-sm font-medium text-gray-700">
+                                                <LogIn className="mr-2 h-4 w-4" />
+                                                Giriş Yap
+                                            </Link>
+                                        </li>
+                                        <li key="kayit">
+                                            <Link href="/kayit-ol" className="flex items-center p-4 text-sm font-medium text-gray-700">
+                                                <UserPlus className="mr-2 h-4 w-4" />
+                                                Kayıt Ol
+                                            </Link>
+                                        </li>
+                                    </>
+                                )}
+                                {staticLinks.map((link) => (
                                     <li key={link.name}>
-                                        <a
-                                            href="#"
+                                        <Link
+                                            href={link.href}
                                             className="block p-4 text-sm font-medium text-gray-700"
                                         >
                                             {link.name}
-                                        </a>
+                                        </Link>
                                     </li>
                                 ))}
                             </ul>
@@ -73,7 +107,7 @@ export function HeaderMobil() {
                 </SheetContent>
             </Sheet>
             <Logo />
-            <CartButton count={3} />
+            <CartDrawer />
         </div>
     );
 }
