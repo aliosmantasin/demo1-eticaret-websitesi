@@ -20,6 +20,7 @@ export interface Product {
   average_star: number;
   stock?: number; // Yeni alan
   description?: string | null; // Yeni alan
+  isBestseller?: boolean; // Çok satanlar için
 }
 
 export interface User {

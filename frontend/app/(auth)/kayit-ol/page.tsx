@@ -81,7 +81,7 @@ export default function RegisterPage() {
                         />
                     </div>
                     <div>
-                        <label htmlFor="password" a className="block text-sm font-medium text-gray-700">
+                        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                             Şifre
                         </label>
                         <Input
