@@ -1,4 +1,4 @@
-import { PrismaClient, Category } from '@prisma/client';
+import { PrismaClient, Category, User } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -261,18 +261,23 @@ async function main() {
                 firstName: 'Admin',
                 lastName: 'User',
                 role: 'ADMIN',
-            },
+            } as any,
         });
         console.log(`- Admin kullanıcısı oluşturuldu.`);
         console.log(`  Email: ${adminEmail}`);
         console.log(`  Şifre: ${adminPassword}`);
     } else {
         // Mevcut admin kullanıcısını güncelle (role'ü ADMIN yap)
-        await prisma.user.update({
-            where: { email: adminEmail },
-            data: { role: 'ADMIN' },
-        });
-        console.log(`- Admin kullanıcısı zaten mevcut, role güncellendi.`);
+        const adminUser = existingAdmin as User & { role?: string };
+        if (adminUser.role !== 'ADMIN') {
+            await prisma.user.update({
+                where: { email: adminEmail },
+                data: { role: 'ADMIN' } as any,
+            });
+            console.log(`- Admin kullanıcısı zaten mevcut, role güncellendi.`);
+        } else {
+            console.log(`- Admin kullanıcısı zaten mevcut ve ADMIN rolüne sahip.`);
+        }
     }
 
     console.log('Tohumlama işlemi başarıyla tamamlandı.');
@@ -281,7 +286,7 @@ async function main() {
 main()
     .catch((e) => {
         console.error('Tohumlama sırasında bir hata oluştu:', e);
-        process.exit(1);
+        throw e;
     })
     .finally(async () => {
         await prisma.$disconnect();
