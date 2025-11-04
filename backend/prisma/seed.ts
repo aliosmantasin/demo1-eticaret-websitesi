@@ -1,4 +1,5 @@
 import { PrismaClient, Category } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
@@ -240,6 +241,39 @@ async function main() {
         }
     }
     console.log('Ürünler başarıyla oluşturuldu.');
+
+    // Admin kullanıcısı oluştur
+    console.log('Admin kullanıcısı oluşturuluyor...');
+    const adminEmail = 'admin@yazilimtech.com';
+    const adminPassword = 'Admin123!';
+    
+    // Mevcut admin kullanıcısını kontrol et
+    const existingAdmin = await prisma.user.findUnique({
+        where: { email: adminEmail },
+    });
+
+    if (!existingAdmin) {
+        const hashedPassword = await bcrypt.hash(adminPassword, 10);
+        await prisma.user.create({
+            data: {
+                email: adminEmail,
+                password: hashedPassword,
+                firstName: 'Admin',
+                lastName: 'User',
+                role: 'ADMIN',
+            },
+        });
+        console.log(`- Admin kullanıcısı oluşturuldu.`);
+        console.log(`  Email: ${adminEmail}`);
+        console.log(`  Şifre: ${adminPassword}`);
+    } else {
+        // Mevcut admin kullanıcısını güncelle (role'ü ADMIN yap)
+        await prisma.user.update({
+            where: { email: adminEmail },
+            data: { role: 'ADMIN' },
+        });
+        console.log(`- Admin kullanıcısı zaten mevcut, role güncellendi.`);
+    }
 
     console.log('Tohumlama işlemi başarıyla tamamlandı.');
 }

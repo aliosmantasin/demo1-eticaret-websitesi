@@ -12,7 +12,14 @@ const Logo = ({ variant = 'default' }: LogoProps) => {
   return (
     <div className='flex items-center relative mx-3 md:mx-0 min-w-36'>
       <Link href="/">
-        <Image src={logoSrc} alt="Logo" width={160} height={160} priority />
+        <Image 
+          src={logoSrc} 
+          alt="Logo" 
+          width={160} 
+          height={60} 
+          priority 
+          className="object-contain"
+        />
       </Link>
     </div>
   )
