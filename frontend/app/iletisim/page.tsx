@@ -74,7 +74,7 @@ export default function ContactPage() {
             <div className="mt-8 p-6 bg-gray-50 rounded-lg">
               <h3 className="font-semibold text-gray-900 mb-3">Kargo Bilgileri</h3>
               <p className="text-sm text-gray-600 mb-2">
-                <strong>Aynı gün kargo:</strong> Hafta içi 16:00, Cumartesi ise 11:00'a kadar verilen 
+                <strong>Aynı gün kargo:</strong> Hafta içi 16:00, Cumartesi ise 11:00&apos;a kadar verilen 
                 siparişler için geçerlidir.
               </p>
               <p className="text-sm text-gray-600">

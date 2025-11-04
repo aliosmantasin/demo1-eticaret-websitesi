@@ -1,5 +1,6 @@
 "use client";
 
+import Link from 'next/link';
 import { CheckCircle, Award, Users, Heart } from 'lucide-react';
 
 export default function AboutPage() {
@@ -43,7 +44,7 @@ export default function AboutPage() {
             </h2>
           </div>
           <p className="text-gray-700 text-center">
-            1.000.000'den fazla kişiye ulaştık. Sanatçılardan profesyonel sporculara, 
+            1.000.000&apos;den fazla kişiye ulaştık. Sanatçılardan profesyonel sporculara, 
             doktorlardan öğrencilere kadar, sağlıklı yaşam ve beslenme hedefi olan herkese 
             hizmet veriyoruz.
           </p>
@@ -146,12 +147,12 @@ export default function AboutPage() {
           <p className="mb-6 opacity-90">
             Sağlıklı yaşam yolculuğunuzda yanınızdayız. Premium kalitede ürünlerimizi inceleyin.
           </p>
-          <a 
+          <Link 
             href="/kategori/protein"
             className="inline-block bg-white text-primary px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
           >
             Ürünlere Göz Atın
-          </a>
+          </Link>
         </div>
       </div>
     </div>

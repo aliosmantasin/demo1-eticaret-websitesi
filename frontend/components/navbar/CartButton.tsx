@@ -44,7 +44,7 @@ export function CartButton({ count: propCount }: CartButtonProps) {
 
                 if (response.ok) {
                     const cart = await response.json();
-                    const totalItems = cart.items?.reduce((sum: number, item: any) => sum + item.quantity, 0) || 0;
+                    const totalItems = cart.items?.reduce((sum: number, item: { quantity: number }) => sum + item.quantity, 0) || 0;
                     setCartCount(totalItems);
                 }
             } catch (error) {

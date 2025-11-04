@@ -38,8 +38,8 @@ export default function RegisterPage() {
             alert('Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz.');
             router.push('/giris-yap');
 
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'Bir hata oluştu');
         }
     };
 
