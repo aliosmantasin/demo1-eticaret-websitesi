@@ -6,6 +6,9 @@ import { Product } from "@/types";
 import React from "react";
 import { notFound } from "next/navigation";
 
+// Bu sayfa dinamik veri çektiği için her zaman server-side render edilmeli
+export const dynamic = 'force-dynamic';
+
 async function getProduct(slug: string): Promise<Product | null> {
     try {
         const apiUrl =

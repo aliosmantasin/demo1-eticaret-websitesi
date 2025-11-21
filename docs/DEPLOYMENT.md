@@ -448,10 +448,16 @@ git push origin main
 # 1. Import Project → GitHub repo
 # 2. Framework: Next.js
 # 3. Root Directory: frontend
-# 4. Environment:
+# 4. Environment Variables (ÖNEMLİ - İKİSİ DE GEREKLİ):
    NEXT_PUBLIC_API_URL=https://your-api.railway.app
+   INTERNAL_API_URL=https://your-api.railway.app
 # 5. Deploy!
 ```
+
+**⚠️ ÖNEMLİ:** Vercel'de **hem** `NEXT_PUBLIC_API_URL` **hem de** `INTERNAL_API_URL` tanımlanmalıdır. İkisi de aynı Railway backend URL'ine işaret etmelidir.
+
+- `NEXT_PUBLIC_API_URL`: Tarayıcı tarafında (client-side) kullanılır
+- `INTERNAL_API_URL`: Sunucu tarafında (SSR) kullanılır - Bu olmadan ürünler, kategoriler ve diğer veriler görünmez!
 
 ---
 

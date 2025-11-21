@@ -133,3 +133,80 @@ Veritabanı şemasına ürün varyantları eklendikten sonra, bu değişiklikler
 
 
 
+## Sorun: Vercel Deploy Sonrası Ürünler ve Veriler Görünmüyor (Kasım 2025)
+
+### Problem: Canlı Sitede Veri Görünmeme
+
+- **Hata Belirtisi:**
+    - Local'de çalışan site normal görünüyor (ürünler, kategoriler, bestseller'lar görünüyor)
+    - GitHub'a push edip Vercel'de deploy edildikten sonra canlı sitede ürünler, kategoriler ve diğer veriler görünmüyor
+    - Sadece statik içerikler (örneğin "Gerçek Müşteri Yorumları" bölümü) görünüyor
+
+- **Neden:**
+    1.  **Eksik Environment Variable:** Vercel'de sadece `NEXT_PUBLIC_API_URL` tanımlıydı, ancak `INTERNAL_API_URL` tanımlı değildi.
+    2.  **SSR Veri Çekme Sorunu:** Next.js'in Server-Side Rendering (SSR) özelliği kullanılarak sayfalar oluşturulurken, `page.tsx` dosyalarındaki `getProducts()`, `getProduct()` gibi fonksiyonlar `INTERNAL_API_URL` environment variable'ını kullanıyor.
+    3.  **Kod Mantığı:** Kod, `typeof window === 'undefined'` kontrolü ile sunucu tarafında mı yoksa tarayıcıda mı çalıştığını anlıyor:
+        - Sunucu tarafındaysa (SSR): `INTERNAL_API_URL` kullanılır
+        - Tarayıcı tarafındaysa: `NEXT_PUBLIC_API_URL` kullanılır
+    4.  **Sonuç:** `INTERNAL_API_URL` tanımlı olmadığı için SSR sırasında API istekleri başarısız oluyor ve boş array dönüyor, bu yüzden ürünler görünmüyor.
+
+- **Çözüm Adımları:**
+    1.  **Vercel Dashboard'a Git:**
+        - Projenizi seçin → Settings → Environment Variables
+    2.  **İki Environment Variable Ekleyin:**
+        - `NEXT_PUBLIC_API_URL`: Railway backend URL'iniz (örn: `https://your-backend.up.railway.app`)
+        - `INTERNAL_API_URL`: Aynı Railway backend URL'iniz (aynı değer)
+    3.  **Deploy'u Yeniden Başlatın:**
+        - Deployments sekmesine gidin
+        - Son deployment'ı seçin → "Redeploy" butonuna tıklayın
+        - Veya yeni bir commit push edin
+    4.  **Doğrulama:**
+        - Canlı siteyi yenileyin
+        - Ürünler, kategoriler ve diğer veriler artık görünmeli
+
+**Not:** `INTERNAL_API_URL` ve `NEXT_PUBLIC_API_URL` aynı değere sahip olmalıdır (Railway backend URL'iniz). İkisi de aynı backend'e işaret eder, sadece kullanım yerleri farklıdır (SSR vs client-side).
+
+
+
+## Sorun: Vercel Build Hatası - Dynamic Server Usage (Kasım 2025)
+
+### Problem: Next.js Statik Sayfa Oluşturma Hatası
+
+- **Hata Belirtisi:**
+    - Vercel'de build sırasında şu hata alınıyor:
+    ```
+    Error: Dynamic server usage: Route / couldn't be rendered statically because it used revalidate: 0 fetch
+    ```
+    - Build tamamlanıyor ancak bu hata loglarda görünüyor
+    - Sayfalar `ƒ (Dynamic)` olarak işaretleniyor
+
+- **Neden:**
+    1.  **Next.js Statik Sayfa Oluşturma:** Next.js, build sırasında sayfaları statik olarak oluşturmaya (SSG - Static Site Generation) çalışır.
+    2.  **Dinamik Veri Çekme:** Sayfalarda `cache: 'no-store'` kullanılarak dinamik veri çekiliyor.
+    3.  **Çakışma:** `cache: 'no-store'` kullanımı, sayfanın her istekte yeniden render edilmesini gerektirir, bu da statik sayfa oluşturma ile çakışır.
+    4.  **Next.js 15 Değişikliği:** Next.js 15, bu durumu daha sıkı kontrol ediyor ve hata olarak işaretliyor.
+
+- **Çözüm Adımları:**
+    1.  **Sayfaları Dinamik Olarak İşaretle:** İlgili sayfa dosyalarına (`page.tsx`) şu satırı ekleyin:
+        ```typescript
+        export const dynamic = 'force-dynamic';
+        ```
+    2.  **Etkilenen Sayfalar:**
+        - `app/page.tsx` (Ana sayfa)
+        - `app/paketler/page.tsx` (Paketler listesi)
+        - `app/kategori/[slug]/page.tsx` (Kategori sayfası)
+        - `app/urun/[slug]/page.tsx` (Ürün detay sayfası)
+        - `app/paketler/[slug]/page.tsx` (Paket detay sayfası)
+    3.  **Neden Bu Çözüm:**
+        - `export const dynamic = 'force-dynamic'` ifadesi, Next.js'e bu sayfanın her zaman server-side render edilmesi gerektiğini söyler.
+        - Bu, admin panelden yapılan değişikliklerin anında yansıması için de uygundur.
+        - Sayfalar artık statik olarak oluşturulmaya çalışılmaz, her istekte dinamik olarak render edilir.
+    4.  **Deploy:**
+        - Değişiklikleri commit edip push edin
+        - Vercel otomatik olarak yeni build başlatacak
+        - Build başarılı olacak ve hata görünmeyecek
+
+**Not:** Bu çözüm, sayfaların her zaman dinamik olarak render edilmesini sağlar. Bu, admin panelden yapılan değişikliklerin anında görünmesi için idealdir, ancak performans açısından statik sayfalardan biraz daha yavaş olabilir. E-ticaret sitelerinde ürün verilerinin sık değişebilmesi nedeniyle bu yaklaşım genellikle tercih edilir.
+
+
+

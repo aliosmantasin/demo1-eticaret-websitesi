@@ -366,10 +366,16 @@ docker exec -it ecom_backend_api sh -c "cd /usr/src/app/backend && pnpm prisma s
    Output Directory: .next
    ```
 
-3. **Environment Variables:**
+3. **Environment Variables (ÖNEMLİ - İKİSİ DE GEREKLİ):**
    ```env
    NEXT_PUBLIC_API_URL=https://your-backend.up.railway.app
+   INTERNAL_API_URL=https://your-backend.up.railway.app
    ```
+   
+   **⚠️ ÖNEMLİ:** Vercel'de **hem** `NEXT_PUBLIC_API_URL` **hem de** `INTERNAL_API_URL` tanımlanmalıdır. İkisi de aynı Railway backend URL'ine işaret etmelidir.
+   
+   - `NEXT_PUBLIC_API_URL`: Tarayıcı tarafında (client-side) kullanılır
+   - `INTERNAL_API_URL`: Sunucu tarafında (SSR) kullanılır - Bu olmadan ürünler, kategoriler ve diğer veriler görünmez!
 
 4. **Deploy:**
    - "Deploy" → İlk build otomatik başlar

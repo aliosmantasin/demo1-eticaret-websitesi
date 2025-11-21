@@ -8,6 +8,9 @@ import { PopularProducts } from '@/components/homepage/PopularProducts';
 import { PackagesBanner } from '@/components/homepage/PackagesBanner';
 import { Product } from '@/types';
 
+// Bu sayfa dinamik veri çektiği için her zaman server-side render edilmeli
+export const dynamic = 'force-dynamic';
+
 async function getProducts(): Promise<Product[]> {
   try {
     const apiUrl =

@@ -2,6 +2,9 @@ import { ProductList } from '@/components/products/ProductList';
 import { Product } from '@/types';
 import React from 'react';
 
+// Bu sayfa dinamik veri çektiği için her zaman server-side render edilmeli
+export const dynamic = 'force-dynamic';
+
 async function getProducts(slug: string): Promise<Product[]> {
     try {
         const apiUrl =
