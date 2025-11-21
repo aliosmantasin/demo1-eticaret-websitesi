@@ -1,13 +1,15 @@
-import { HeaderDesktop } from "./navbar/HeaderDesktop";
-import { HeaderMobil } from "./navbar/HeaderMobil";
+import { NavbarDesktop } from "./navbar/HeaderDesktop";
+import { NavbarMobil } from "./navbar/HeaderMobil";
 import { CategoryNavbar } from "./navbar/CategoryNavbar";
 import { InfoBar } from "./navbar/InfoBar";
+import { Marquee } from "./navbar/Marquee";
 
 const Header = () => {
   return (
     <header>
-      <HeaderDesktop />
-      <HeaderMobil />
+      <Marquee />
+      <NavbarDesktop />
+      <NavbarMobil />
       <CategoryNavbar />
       <InfoBar />
     </header>

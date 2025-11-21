@@ -9,22 +9,36 @@ import {
 } from "@/components/ui/sheet";
 import { ChevronRight, Menu, LogOut, User,LogIn, UserPlus   } from "lucide-react";
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { Category } from "@/types";
 
 import Logo from "./Logo";
 import { useAuth } from "@/context/AuthContext";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 
-const categories = [
-    { name: "PROTEİN" },
-    { name: "SPOR GIDALARI" },
-    { name: "SAĞLIK" },
-    { name: "GIDA" },
-    { name: "VİTAMİN" },
-    { name: "TÜM ÜRÜNLER" },
-];
-
-export function HeaderMobil() {
+export function NavbarMobil() {
     const { token, logout } = useAuth();
+    const [categories, setCategories] = useState<Category[]>([]);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+                const response = await fetch(`${apiUrl}/api/categories`, {
+                    cache: 'no-store',
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    // Sadece showInNavbar: true olan kategorileri göster
+                    const navbarCategories = data.filter((cat: Category) => cat.showInNavbar !== false);
+                    setCategories(navbarCategories);
+                }
+            } catch (error) {
+                console.error('Kategoriler yüklenemedi:', error);
+            }
+        };
+        fetchCategories();
+    }, []);
 
     const staticLinks = [
         { name: "MÜŞTERİ YORUMLARI", href: "/yorumlar" },
@@ -43,20 +57,24 @@ export function HeaderMobil() {
                     </SheetHeader>
                     <div className="flex h-full flex-col">
                         <ul className="grow pt-8">
-                            {categories.map((category) => (
-                                <li
-                                    key={category.name}
-                                    className="border-b border-gray-200"
-                                >
-                                    <Link
-                                        href="#"
-                                        className="flex items-center justify-between p-4 text-sm font-medium"
+                            {categories.map((category) => {
+                                // Paketler kategorisi için özel route
+                                const href = category.slug === 'paketler' ? '/paketler' : `/kategori/${category.slug}`;
+                                return (
+                                    <li
+                                        key={category.slug}
+                                        className="border-b border-gray-200"
                                     >
-                                        {category.name}
-                                        <ChevronRight className="h-5 w-5" />
-                                    </Link>
-                                </li>
-                            ))}
+                                        <Link
+                                            href={href}
+                                            className="flex items-center justify-between p-4 text-sm font-medium"
+                                        >
+                                            {category.name}
+                                            <ChevronRight className="h-5 w-5" />
+                                        </Link>
+                                    </li>
+                                );
+                            })}
                         </ul>
                         <div className="border-t border-gray-200 bg-gray-50">
                             <ul>

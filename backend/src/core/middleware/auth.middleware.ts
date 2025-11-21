@@ -20,7 +20,7 @@ export const authenticateToken = async (
       return res.status(401).json({ message: 'Access token is required' });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as { userId: string };
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { userId: string, role: string };
 
     // Kullanıcının gerçekten veritabanında var olup olmadığını kontrol et
     const user = await prisma.user.findUnique({
@@ -28,15 +28,15 @@ export const authenticateToken = async (
     });
 
     if (!user) {
-      return res.status(401).json({ message: 'Invalid token' });
+      return res.status(401).json({ message: 'Invalid token: User not found' });
     }
 
     req.userId = decoded.userId;
-    req.userRole = user.role;
+    req.userRole = decoded.role; // Rolü direkt token'dan al
     next();
   } catch (error) {
     if (error instanceof jwt.JsonWebTokenError) {
-      return res.status(403).json({ message: 'Invalid token' });
+      return res.status(403).json({ message: `Invalid token: ${error.message}` });
     }
     return res.status(500).json({ message: 'Internal server error' });
   }

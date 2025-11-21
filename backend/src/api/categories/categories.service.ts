@@ -8,10 +8,14 @@ import prisma from '../../core/services/prisma.service';
  * @returns Kategori listesi
  */
 export const getAllCategories = async () => {
-  const categories = await prisma.category.findMany({
-    orderBy: { createdAt: 'desc' },
+  return prisma.category.findMany({
+    include: {
+      image: true, // İlişkili görseli de getir
+    },
+    orderBy: {
+      createdAt: 'asc',
+    },
   });
-  return categories;
 };
 
 /**
@@ -28,6 +32,13 @@ export const getCategoryById = async (categoryId: string) => {
   return category;
 };
 
+interface CategoryData {
+  name: string;
+  slug: string;
+  imageId?: string | null;
+  showInNavbar?: boolean;
+}
+
 /**
  * Yeni bir kategori oluşturur.
  * Kullanım: Admin panelinde kategori ekleme işlemi.
@@ -35,9 +46,13 @@ export const getCategoryById = async (categoryId: string) => {
  * @param categoryData - Kategori verisi (isim, slug)
  * @returns Oluşturulan kategori
  */
-export const createCategory = async (categoryData: Prisma.CategoryCreateInput) => {
+export const createCategory = async (categoryData: CategoryData) => {
+  const { imageId, ...data } = categoryData;
   const newCategory = await prisma.category.create({
-    data: categoryData,
+    data: {
+      ...data,
+      ...(imageId && { image: { connect: { id: imageId } } }),
+    },
   });
   return newCategory;
 };
@@ -50,11 +65,35 @@ export const createCategory = async (categoryData: Prisma.CategoryCreateInput) =
  * @param categoryData - Güncellenecek kategori verisi
  * @returns Güncellenmiş kategori
  */
-export const updateCategory = async (categoryId: string, categoryData: Prisma.CategoryUpdateInput) => {
+export const updateCategory = async (categoryId: string, categoryData: CategoryData) => {
+  const { imageId, showInNavbar, ...data } = categoryData;
+  
+  console.log('updateCategory - Gelen veri:', JSON.stringify({ categoryId, showInNavbar, imageId }, null, 2));
+  
+  const updateData: any = {
+    ...data,
+  };
+  
+  // showInNavbar alanını ekle (undefined değilse)
+  // false değeri de geçerli bir değer olduğu için kontrol ediyoruz
+  if (showInNavbar !== undefined && showInNavbar !== null) {
+    updateData.showInNavbar = showInNavbar;
+  }
+  
+  // imageId işlemi
+  if (imageId !== undefined) {
+    updateData.image = imageId ? { connect: { id: imageId } } : { disconnect: true };
+  }
+  
+  console.log('updateCategory - Prisma update data:', JSON.stringify(updateData, null, 2));
+  
   const updatedCategory = await prisma.category.update({
     where: { id: categoryId },
-    data: categoryData,
+    data: updateData,
   });
+  
+  console.log('updateCategory - Güncellenmiş kategori:', JSON.stringify({ id: updatedCategory.id, showInNavbar: (updatedCategory as any).showInNavbar }, null, 2));
+  
   return updatedCategory;
 };
 

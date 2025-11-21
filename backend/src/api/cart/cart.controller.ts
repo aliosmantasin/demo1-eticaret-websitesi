@@ -30,13 +30,20 @@ cartRouter.get('/', authenticateToken, async (req: AuthenticatedRequest, res: Re
 
 // Sepete ürün ekle
 cartRouter.post('/items', authenticateToken, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  try {
-    if (!req.userId) {
+    const { productId, quantity, variantId } = req.body;
+    // req.user!.id yerine req.userId kullan ve varlığını kontrol et
+    const userId = req.userId;
+
+    if (!userId) {
       return res.status(401).json({ message: 'User not authenticated' });
     }
 
-    const { productId, quantity } = AddToCartSchema.parse(req.body);
-    const cartItem = await CartService.addItemToCart(req.userId, productId, quantity);
+    if (!productId || !quantity) {
+        return res.status(400).json({ message: 'productId and quantity are required' });
+    }
+
+    try {
+        const cartItem = await CartService.addItemToCart(userId, productId, quantity, variantId);
     res.status(201).json(cartItem);
   } catch (error) {
     next(error);

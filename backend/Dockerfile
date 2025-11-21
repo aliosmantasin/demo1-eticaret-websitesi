@@ -43,7 +43,7 @@ RUN pnpm --filter "./backend" build
 WORKDIR /usr/src/app/backend
 
 # 9. Expose Port
-EXPOSE 5000
+EXPOSE 5001
 
 # 10. Start the Application
 CMD [ "pnpm", "start" ]

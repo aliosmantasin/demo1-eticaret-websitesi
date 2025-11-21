@@ -4,7 +4,16 @@ import React from 'react';
 
 async function getProducts(slug: string): Promise<Product[]> {
     try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+        const apiUrl =
+            typeof window === 'undefined'
+                ? process.env.INTERNAL_API_URL // Sunucu tarafı (SSR)
+                : process.env.NEXT_PUBLIC_API_URL; // Tarayıcı tarafı (Client-side)
+        
+        if (!apiUrl) {
+            console.error('API URL tanımlı değil. Lütfen .env.local veya docker-compose.yml dosyanızı kontrol edin.');
+            return [];
+        }
+        
         // Backend'e kategoriye göre filtreleme isteği gönderiyoruz
         const res = await fetch(`${apiUrl}/api/products?category=${slug}`, {
             cache: 'no-store',

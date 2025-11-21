@@ -7,13 +7,13 @@ import Link from 'next/link';
 
 interface ProductCardProps {
   product: Product;
+  showShortExplanation?: boolean;
 }
 
 // Yıldızları render etmek için bir yardımcı fonksiyon
 const renderStars = (rating: number) => {
   const stars = [];
   const fullStars = Math.floor(rating);
-  const hasHalfStar = rating % 1 !== 0; // Bu projede kullanmıyoruz ama ilerisi için faydalı olabilir
 
   for (let i = 0; i < 5; i++) {
     if (i < fullStars) {
@@ -26,59 +26,83 @@ const renderStars = (rating: number) => {
 };
 
 
-const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  const hasDiscount = product.discounted_price && product.discounted_price < product.price;
+const ProductCard: React.FC<ProductCardProps> = ({ product, showShortExplanation = true }) => {
+  let displayPrice: number = 0;
+  let originalPrice: number | null = null;
+  let discountPercentage: number = 0;
+  let hasDiscount: boolean = false;
+
+  if (product.variants && product.variants.length > 0) {
+    const variantsWithDiscount = product.variants.filter(
+      (v) => v.discounted_price != null && v.discounted_price < v.price
+    );
+
+    if (variantsWithDiscount.length > 0) {
+      // İndirimli varyantlar varsa, en düşük indirimli fiyatı bul
+      hasDiscount = true;
+      const bestDealVariant = variantsWithDiscount.reduce((best, current) =>
+        current.discounted_price! < best.discounted_price! ? current : best
+      );
+      displayPrice = bestDealVariant.discounted_price!;
+      originalPrice = bestDealVariant.price;
+      discountPercentage = Math.round(((originalPrice - displayPrice) / originalPrice) * 100);
+    } else {
+      // İndirim yoksa, en düşük başlangıç fiyatını bul
+      const prices = product.variants.map((v) => v.price);
+      displayPrice = Math.min(...prices);
+    }
+  }
 
   return (
-    <Link href={`/urun/${product.slug}`} className="flex h-full flex-col">
-      <div className="flex h-full flex-col rounded-lg border bg-white shadow-md transition-shadow duration-300 hover:shadow-lg group">
-        <div className="relative mb-2 h-48 w-full">
+    <Link href={`/urun/${product.slug}`} className="group text-center flex flex-col h-full bg-white rounded-lg border shadow-sm hover:shadow-lg transition-shadow duration-300">
+      <div className="relative">
+        <div className="aspect-square w-full overflow-hidden rounded-t-lg">
           {product.images && product.images[0] ? (
             <Image
-              src={product.images[0]}
+                src={product.images[0].url}
               width={400}
-              height={300}
+                height={400}
               alt={product.name}
-              className="h-full w-full rounded-t-lg object-contain cursor-pointer"
+                className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
             />
           ) : (
             <div className="h-full w-full rounded-t-lg bg-gray-200"></div>
           )}
+        </div>
           {hasDiscount && (
-            <div className="absolute -top-3 right-2 flex h-16 w-16 items-center justify-center rounded bg-red-600 px-2 py-1 text-xs font-bold text-white">
-              <div className="flex flex-col items-center justify-center">
-                <span>%{product.discount_percentage}</span>
-                <span>İndirim</span>
-              </div>
+            <div className="absolute top-0 left-0 bg-red-600 text-white text-sm font-bold px-3 py-2 rounded-tl-lg rounded-br-lg">
+                %{discountPercentage} İNDİRİM
             </div>
           )}
         </div>
-        <div className="flex grow flex-col items-center justify-center p-4">
-          <h2 className="mb-2 grow text-center text-base font-semibold text-gray-800">{product.name}</h2>
-          <div className="mb-2 flex items-center gap-2">
+      <div className="flex flex-col p-4 grow">
+        <h2 className="text-base font-bold text-gray-800 uppercase tracking-wide">{product.name}</h2>
+        {showShortExplanation && product.short_explanation && (
+            <p className="text-xs text-gray-500 mt-1 h-8">{product.short_explanation}</p>
+        )}
+        <div className="flex justify-center items-center gap-2 mt-2">
             <div className="flex">
               {renderStars(product.average_star)}
-            </div>
           </div>
           <span className="text-xs text-gray-500">
-            {product.comment_count} yorum
+                {product.comment_count} Yorum
           </span>
-          <div className="mt-auto">
-            {hasDiscount ? (
-              <div className="flex items-end gap-2">
-                <p className="text-sm text-gray-500 line-through">
-                  {product.price.toFixed(2)} TL
+        </div>
+        <div className="mt-4 grow-0">
+            {hasDiscount && originalPrice ? (
+                <div className="flex items-baseline justify-center gap-2">
+                    <p className="text-lg text-gray-500 line-through">
+                        {originalPrice.toFixed(2)} TL
                 </p>
-                <p className="text-xl font-bold text-red-600">
-                  {product.discounted_price?.toFixed(2)} TL
+                <p className="text-xl font-bold text-green-600">
+                        {displayPrice.toFixed(2)} TL
                 </p>
               </div>
             ) : (
               <p className="text-xl font-bold text-gray-900">
-                {product.price.toFixed(2)} TL
+                    {displayPrice > 0 ? `${displayPrice.toFixed(2)} TL` : 'Fiyat Belirtilmemiş'}
               </p>
             )}
-          </div>
         </div>
       </div>
     </Link>

@@ -1,20 +1,32 @@
-import { Banner } from '@/components/homepage/Banner';
+import { HomepageBanner } from '@/components/homepage/Banner';
 import { Bestsellers } from '@/components/homepage/Bestsellers';
 import { CategoryShowcase } from '@/components/homepage/CategoryShowcase';
-import { PromotionBanner } from '@/components/homepage/PromotionBanner';
+import { HomepagePromotionBanner } from '@/components/homepage/PromotionBanner';
 import { Reviews } from '@/components/homepage/Reviews';
 import { Assurance } from '@/components/homepage/Assurance';
+import { PopularProducts } from '@/components/homepage/PopularProducts';
+import { PackagesBanner } from '@/components/homepage/PackagesBanner';
 import { Product } from '@/types';
 
 async function getProducts(): Promise<Product[]> {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    const apiUrl =
+            typeof window === 'undefined'
+                ? process.env.INTERNAL_API_URL // Sunucu tarafı (SSR)
+                : process.env.NEXT_PUBLIC_API_URL; // Tarayıcı tarafı (Client-side)
+
+
+    if (!apiUrl) {
+      console.error('API URL tanımlı değil. Lütfen .env.local veya docker-compose.yml dosyanızı kontrol edin.');
+      return [];
+    }
+
     const res = await fetch(`${apiUrl}/api/products`, {
       cache: 'no-store', // Sunucu tarafında her istekte veriyi yeniden çekmek için
     });
 
     if (!res.ok) {
-      console.error('Failed to fetch products:', res.statusText);
+      console.error('Failed to fetch products:', res.status, res.statusText);
       return [];
     }
 
@@ -32,10 +44,12 @@ export default async function Home() {
 
   return (
     <>
-      <Banner />
+      <HomepageBanner />
       <CategoryShowcase />
       <Bestsellers products={products} />
-      <PromotionBanner />
+      <HomepagePromotionBanner />
+      <PopularProducts products={products} />
+      <PackagesBanner />
       <Reviews />
       <Assurance />
     </>

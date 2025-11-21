@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LogOut, User, ChevronDown } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
@@ -16,6 +17,11 @@ import { useRouter } from "next/navigation";
 export function AccountDropdown() {
   const { logout } = useAuth();
   const router = useRouter();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -32,8 +38,12 @@ export function AccountDropdown() {
         <button className="flex w-36 items-center justify-between gap-2 rounded-md border p-2 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400">
           <div className="flex items-center gap-2">
             <Avatar className="h-8 w-8">
-              <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-              <AvatarFallback>CN</AvatarFallback>
+              {isMounted && (
+                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+              )}
+              <AvatarFallback>
+                <User className="h-4 w-4 text-gray-600" />
+              </AvatarFallback>
             </Avatar>
             <span className="font-medium">Hesabım</span>
           </div>

@@ -58,3 +58,55 @@ Projenin Docker üzerinde çalıştırılmaya çalışıldığı sırada, saatle
 
 
 
+## Sorun: API URL Tutarsızlığı (IDE vs. Docker Modu) (Kasım 2025)
+
+Proje hem Docker konteynerleri üzerinden hem de doğrudan IDE'de (örn. `pnpm run dev`) çalıştırılacak şekilde tasarlanmıştır. Ancak, bu iki ortamda `frontend`'in `backend` API'sine hangi adresten ulaşacağı konusunda bir tutarsızlık yaşanmıştır.
+
+### Problem: `fetch` Hataları ve Veri Gelmeme
+
+- **Hata Belirtisi:**
+    - **Docker Modu:** Frontend konteyneri içindeki Sunucu Tarafı Render (SSR) işlemi, `backend`'e `http://localhost:5001` adresinden ulaşmaya çalıştığında başarısız oluyordu, çünkü konteynerler birbirleriyle `localhost` üzerinden konuşamazlar.
+    - **IDE Modu:** `.env.local` dosyasındaki yanlış veya eksik yapılandırma nedeniyle, IDE'de çalışan `frontend` de `backend`'e doğru adresten istek atamıyordu.
+
+- **Neden:**
+    1.  **Çalışma Ortamı Farklılığı:** Bir kod parçasının çalıştığı yer (tarayıcı, ana makinedeki Node.js sunucusu, konteyner içindeki Node.js sunucusu) API'ye nasıl erişeceğini değiştirir.
+    2.  **Tek Yönlü Çözüm:** Daha önceki çözümler (`host.docker.internal` gibi) sadece senaryolardan birini çözüyor, diğerini bozuyordu. Tüm senaryoları (Tarayıcı, IDE-SSR, Docker-SSR) kapsayan birleşik bir mantık eksikti.
+
+- **Çözüm Adımları:**
+    1.  **Birleşik Mantık Geliştirme:** `frontend`'deki tüm veri çekme (`fetch`) işlemleri standartlaştırıldı. Kod, `typeof window === 'undefined'` kontrolü ile sunucu tarafında mı yoksa tarayıcıda mı çalıştığını anlar.
+        - Sunucu tarafındaysa (SSR), `INTERNAL_API_URL` ortam değişkenini kullanır.
+        - Tarayıcı tarafındaysa, `NEXT_PUBLIC_API_URL` ortam değişkenini kullanır.
+    2.  **Docker Yapılandırması (`docker-compose.yml`):** `frontend` servisi için ortam değişkenleri doğru şekilde ayarlandı:
+        - `NEXT_PUBLIC_API_URL=http://localhost:5001` (Tarayıcı ana makinede olduğu için `localhost` kullanır)
+        - `INTERNAL_API_URL=http://backend:5001` (Konteynerler birbirleriyle servis adları üzerinden konuşur)
+    3.  **IDE Yapılandırması (`frontend/.env.local`):** IDE'de çalışmayı sağlamak için bu dosya oluşturuldu ve her iki değişken de `localhost`'a yönlendirildi:
+        - `NEXT_PUBLIC_API_URL=http://localhost:5001`
+        - `INTERNAL_API_URL=http://localhost:5001`
+    4.  **Uygulama:** Bu standart mantık projedeki tüm sayfalara (`/`, `/urun/[slug]`, `/kategori/[slug]`, `/giris-yap`) uygulandı ve sorun kalıcı olarak çözüldü.
+
+
+
+## Sorun: Prisma Migration Hatası ve Port Çakışması (Kasım 2025)
+
+Veritabanı şemasına ürün varyantları eklendikten sonra, bu değişiklikleri veritabanına uygulamak için `pnpm prisma migrate dev` komutu çalıştırıldığında inatçı bir erişim hatasıyla karşılaşıldı.
+
+### Problem: `P1010: User 'admin' was denied access` Hatası
+
+- **Hata Belirtisi:**
+    - `docker exec` üzerinden çalıştırıldığında komut, interaktif bir ortam olmadığı için başarısız oldu.
+    - Bunun üzerine komut, interaktif olan yerel makine terminalinden çalıştırıldı.
+    - Bu sefer de `backend/.env` dosyasındaki `DATABASE_URL`'in doğru olmasına ve hatta Docker veritabanı volume'ünün (`docker volume rm ...`) tamamen sıfırlanmasına rağmen, komut sürekli olarak `P1010: User 'admin' was denied access on the database 'ecom_db.public'` hatası verdi.
+
+- **Neden (Asıl Kök Neden):**
+    1.  **Port Çakışması:** Sorunun asıl kaynağı, geliştirme makinesinde (Docker dışında) çalışan ve `5432` portunu zaten kullanan başka bir PostgreSQL sunucusunun olmasıydı.
+    2.  **Yanlış Hedef:** `pnpm prisma migrate dev` komutu `localhost:5432`'ye bağlanmaya çalıştığında, Docker'daki veritabanımıza değil, bu diğer yerel veritabanına bağlanıyordu. O veritabanının kimlik bilgileri farklı olduğu için de "erişim reddedildi" hatası alınıyordu.
+    3.  **Yanlış Yönlendiren Çözüm Denemeleri:** Veritabanı şifresini kontrol etmek veya Docker volume'ünü sıfırlamak gibi denemeler, komutumuz en başından beri yanlış veritabanını hedeflediği için işe yaramadı.
+
+- **Çözüm Adımları:**
+    1.  **Teşhis:** Diğer tüm çözümlerin başarısız olması, sorunun bir port çakışması olduğu teşhisini kesinleştirdi.
+    2.  **Port Değişikliği:** Çakışmayı önlemek için, Docker'daki veritabanının dış dünyaya açılan portu değiştirildi. `docker-compose.yml` dosyasında `postgres` servisinin `ports` ayarı `"5432:5432"`'den `"5433:5432"`'ye güncellendi. Bu, "bilgisayarın 5433 portuna gelen istekleri, konteynerin 5432 portuna yönlendir" anlamına gelir.
+    3.  **Bağlantı URL'sini Güncelleme:** `backend/.env` dosyasındaki `DATABASE_URL`, yeni portu yansıtacak şekilde `...localhost:5433...` olarak güncellendi.
+    4.  **Yeniden Başlatma ve Uygulama:** `docker-compose up -d` komutuyla servisler yeni port ayarıyla yeniden başlatıldı. Bu adımdan sonra, `pnpm prisma migrate dev` komutu `localhost:5433` üzerinden doğru veritabanına başarıyla bağlandı ve migration işlemi tamamlandı.
+
+
+

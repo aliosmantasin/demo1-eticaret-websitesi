@@ -18,10 +18,18 @@ export default function LoginPage() {
         e.preventDefault();
         setError(null);
 
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+        const baseUrl =
+            typeof window === 'undefined'
+                ? process.env.INTERNAL_API_URL // Sunucu tarafı (SSR)
+                : process.env.NEXT_PUBLIC_API_URL; // Tarayıcı tarafı (Client-side)
+
+        if (!baseUrl) {
+            setError('API URL yapılandırılmamış. Lütfen yöneticiye başvurun.');
+            return;
+        }
 
         try {
-            const res = await fetch(`${apiUrl}/api/auth/login`, {
+            const res = await fetch(`${baseUrl}/api/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

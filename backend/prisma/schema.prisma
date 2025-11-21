@@ -22,80 +22,220 @@ model User {
   role      String   @default("USER") // USER veya ADMIN
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
-  cart      Cart?     // Her kullanıcının tek bir sepeti olacak
-  reviews   Review[]  // Kullanıcının yorumları
+
+  cart    Cart? // Her kullanıcının tek bir sepeti olacak
+  reviews Review[] // Kullanıcının yorumları
 }
 
 model Category {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  slug      String   @unique
-  products  Product[]
+  id       String    @id @default(cuid())
+  name     String    @unique
+  slug     String    @unique
+  showInNavbar Boolean @default(true)
+  products Product[]
+
+  // Kategoriye görsel eklemek için yeni alanlar
+  imageId String? @unique
+  image   Image?  @relation(fields: [imageId], references: [id])
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Product {
-  id                 String   @id @default(cuid())
-  name               String
-  slug               String   @unique
-  description        String?
-  short_explanation  String?  // Yeni alan
-  price              Float
-  discounted_price   Float?   // Yeni alan
-  discount_percentage Int?    // Yeni alan
-  stock              Int      @default(0)
-  isBestseller       Boolean  @default(false)
-  images             String[]
-  comment_count      Int      @default(0) // Yeni alan
-  average_star       Float    @default(0) // Yeni alan
+  id                String    @id @default(cuid())
+  name              String
+  slug              String    @unique
+  tags              String[]  @default([]) // HATA ÇÖZÜMÜ İÇİN EKLENDİ
+  short_explanation String?   @db.Text
+  badge_primary_text   String?  @default("VEJETARYAN")
+  badge_primary_hidden Boolean  @default(false)
+  badge_secondary_text String?  @default("GLUTENSİZ")
+  badge_secondary_hidden Boolean @default(false)
+  expiry_date       String?   // Son kullanma tarihi (örn: "07.2025")
+  features          String?   @db.Text // Özellikler (madde işaretli liste)
+  nutritional_content String? @db.Text // Besin içeriği (içindekiler listesi)
+  usage_instructions String?  @db.Text // Kullanım şekli
+  comment_count     Int       @default(0)
+  average_star      Float     @default(0)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @default(now()) @updatedAt
+  category_id       String?
+  category          Category? @relation(fields: [category_id], references: [id])
+  images            Image[]
+  reviews           Review[]
+  variants          ProductVariant[]
+  cart_items        CartItem[] // Hatanın çözümü için bu satır eklendi
+}
 
-  category   Category @relation(fields: [categoryId], references: [id])
-  categoryId String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  
-  cartItems  CartItem[]  // Sepet öğeleri
-  reviews    Review[]    // Ürün yorumları
+model Image {
+  id  String @id @default(cuid())
+  url String
+  bucket String @default("product-images")
+
+  productId String? // İsteğe bağlı hale getirildi
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  // Category ile tekil ilişki için eklendi
+  category Category?
+
+  productVariants ProductVariant[]
+
+  createdAt DateTime @default(now())
+}
+
+// === YENİ VARYANT MODELLERİ ===
+
+// "Aroma", "Boyut" gibi seçenek gruplarını tanımlar
+model Option {
+  id   String @id @default(cuid())
+  name String @unique // Örn: "Aroma", "Boyut"
+
+  values OptionValue[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// "Çilek", "1000g" gibi her bir seçeneğin değerini tanımlar
+model OptionValue {
+  id       String           @id @default(cuid())
+  value    String
+  color    String? // Renk alanı eklendi
+  option   Option           @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  optionId String
+  products ProductVariant[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([optionId, value])
+}
+
+// Bir ürünün spesifik bir varyasyonunu (örn: Çilekli 1000g Protein Tozu) temsil eder
+model ProductVariant {
+  id               String @id @default(cuid())
+  productId        String
+  stock            Int
+  price            Float // priceModifier yerine direkt fiyat
+  discounted_price Float? // Varyant bazında indirimli fiyat
+
+  product      Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  optionValues OptionValue[] // Bu varyantı oluşturan değerler (örn: "Çilek" ve "1000g")
+
+  cartItems CartItem[] // Bu varyantın olduğu sepet ürünleri
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Bir ürün için aynı option value kombinasyonundan sadece bir tane olabilir
+  // Bu kısıtlama, Prisma seviyesinde karmaşık olduğu için uygulama katmanında yönetilmelidir.
+
+  images Image[]
 }
 
 model Cart {
-  id        String      @id @default(cuid())
-  userId    String      @unique
+  id        String     @id @default(cuid())
+  userId    String     @unique
   items     CartItem[]
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model CartItem {
   id        String   @id @default(cuid())
   cartId    String
-  productId String
+  productId String // Hangi ana ürüne ait
+  variantId String? // Hangi varyanta ait (opsiyonel, eski sistemle uyumluluk için)
   quantity  Int      @default(1)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
-  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  product   Product  @relation(fields: [productId], references: [id])
-  
-  @@unique([cartId, productId])
+
+  cart    Cart            @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product Product         @relation(fields: [productId], references: [id])
+  variant ProductVariant? @relation(fields: [variantId], references: [id])
+
+  @@unique([cartId, productId, variantId])
 }
 
 model Review {
   id        String   @id @default(cuid())
   userId    String
   productId String
-  rating    Int      // 1-5 arası yıldız puanı
-  title     String?  // Yorum başlığı
-  comment   String   // Yorum metni
+  rating    Int // 1-5 arası yıldız puanı
+  title     String? // Yorum başlığı
+  comment   String // Yorum metni
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
   @@unique([userId, productId]) // Her kullanıcı bir ürün için tek yorum yapabilir
+}
+
+// Site geneli ayarlar (singleton pattern - tek satır)
+model SiteSettings {
+  id                String   @id @default("site-settings") // Tek satır olması için sabit ID
+  shipping_text     String   @default("Aynı Gün") // Kargo metni (üst satır)
+  shipping_subtext  String   @default("Ücretsiz Kargo") // Kargo alt metni
+  shipping_hidden   Boolean  @default(false) // Kargo bilgisi gizli mi?
+  customer_count    String   @default("750.000+") // Müşteri sayısı
+  customer_label    String   @default("Mutlu Müşteri") // Müşteri etiketi
+  customer_hidden   Boolean  @default(false) // Müşteri bilgisi gizli mi?
+  guarantee_percent String   @default("%100") // Garanti yüzdesi
+  guarantee_text    String   @default("Memnuniyet Garantisi") // Garanti metni
+  guarantee_hidden  Boolean  @default(false) // Garanti bilgisi gizli mi?
+  infobar_first_text    String   @default("Aynı Gün Kargo")
+  infobar_first_subtext String   @default("16:00'dan Önceki Siparişlerde")
+  infobar_second_text   String   @default("Ücretsiz Kargo")
+  infobar_second_subtext String  @default("1500₺ Üzeri Siparişlerde")
+  infobar_third_text    String   @default("Güvenli Alışveriş")
+  infobar_third_subtext String   @default("450.000+ Mutlu Müşteri")
+  marquee_text          String   @default("Yeni kampanyalarımız başladı! %20'ye varan indirimler.")
+  marquee_speed         Int      @default(1)
+  homepage_banner_desktop_url String?
+  homepage_banner_mobile_url String?
+  homepage_banner_hidden Boolean @default(false)
+  category_showcase_hidden Boolean @default(false)
+  bestsellers_hidden Boolean @default(false)
+  bestsellers_limit  Int      @default(6)
+  homepage_promotion_banner_desktop_url String?
+  homepage_promotion_banner_mobile_url String?
+  homepage_promotion_banner_hidden Boolean @default(false)
+  assurance_title    String   @default("LABORATUVAR TESTLİ ÜRÜNLER\nAYNI GÜN & ÜCRETSİZ KARGO MEMNUNİYET GARANTİSİ")
+  assurance_text     String?  @db.Text
+  assurance_hidden   Boolean  @default(false)
+  logo_image_url      String?
+  logo_white_image_url String?
+  footer_copyright_text String @default("Copyright © - Tüm Hakları Saklıdır.")
+  footer_credits_text   String?
+  footer_credits_url    String?
+  popular_product_slugs  String[] @default([])
+  popular_products_hidden Boolean  @default(false)
+  popular_products_limit   Int      @default(9)
+  popular_products_title   String   @default("Topluluğun Favorileri")
+  popular_products_subtitle String? @default("Sporcuların en çok tercih ettiği ürünleri keşfet.")
+  packages_banner_desktop_url String?
+  packages_banner_mobile_url String?
+  packages_banner_hidden Boolean @default(false)
+  updatedAt         DateTime @updatedAt
+  createdAt         DateTime @default(now())
+}
+
+model FooterLink {
+  id        String            @id @default(cuid())
+  text      String
+  url       String
+  order     Int               @default(0)
+  section   FooterLinkSection
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+}
+
+enum FooterLinkSection {
+  COMPANY
+  INFO
 }

@@ -8,9 +8,13 @@ interface BreadcrumbProps {
         slug: string;
     };
     productName: string;
+    customCategoryPath?: string;
 }
 
-export const Breadcrumb: React.FC<BreadcrumbProps> = ({ category, productName }) => {
+export const Breadcrumb: React.FC<BreadcrumbProps> = ({ category, productName, customCategoryPath }) => {
+    // Paketler kategorisi için özel route veya custom path kullan
+    const categoryHref = customCategoryPath || (category.slug === 'paketler' ? '/paketler' : `/kategori/${category.slug}`);
+    
     return (
         <nav aria-label="breadcrumb" className="mb-4 text-sm text-gray-500">
             <ol className="flex items-center space-x-2">
@@ -23,7 +27,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({ category, productName })
                     <ChevronRight className="h-4 w-4" />
                 </li>
                 <li>
-                    <Link href={`/kategori/${category.slug}`} className="hover:text-primary">
+                    <Link href={categoryHref} className="hover:text-primary">
                         {category.name}
                     </Link>
                 </li>

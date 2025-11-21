@@ -7,8 +7,7 @@ import { AccountDropdown } from "./AccountDropdown";
 import { GuestDropdown } from "./GuestDropdown";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 
-
-export function HeaderDesktop() {
+export function NavbarDesktop() {
   const { token } = useAuth();
 
   return (

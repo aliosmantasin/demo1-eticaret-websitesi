@@ -24,10 +24,17 @@ interface CartItem {
     id: string;
     name: string;
     slug: string;
-    price: number;
-    discounted_price?: number;
-    images: string[];
+    images: { id: string; url: string }[];
   };
+  variant: {
+    id: string;
+    price: number;
+    discounted_price: number | null;
+    optionValues: {
+      value: string;
+      option: { name: string };
+    }[];
+  } | null;
 }
 
 interface Cart {
@@ -41,7 +48,7 @@ export default function CartPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<{ id: string; name: string } | null>(null);
-  const { token } = useAuth();
+  const { token, authFetch } = useAuth(); // authFetch eklendi
   const router = useRouter();
 
   const fetchCart = useCallback(async () => {
@@ -52,11 +59,7 @@ export default function CartPage() {
     
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-      const response = await fetch(`${apiUrl}/api/cart`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+      const response = await authFetch(`${apiUrl}/api/cart`); // authFetch kullanılıyor
 
       if (response.ok) {
         const cartData = await response.json();
@@ -67,18 +70,17 @@ export default function CartPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [token]);
+  }, [token, authFetch]);
 
   const updateQuantity = async (itemId: string, newQuantity: number) => {
     if (!token || newQuantity < 1) return;
     
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-      const response = await fetch(`${apiUrl}/api/cart/items/${itemId}`, {
+      const response = await authFetch(`${apiUrl}/api/cart/items/${itemId}`, { // authFetch kullanılıyor
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({ quantity: newQuantity }),
       });
@@ -102,11 +104,8 @@ export default function CartPage() {
 
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-      const response = await fetch(`${apiUrl}/api/cart/items/${itemToDelete.id}`, {
+      const response = await authFetch(`${apiUrl}/api/cart/items/${itemToDelete.id}`, { // authFetch kullanılıyor
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
       });
 
       if (response.ok) {
@@ -129,12 +128,16 @@ export default function CartPage() {
     if (!cart || cart.items.length === 0) return 0;
     
     return cart.items.reduce((total, item) => {
-      const itemPrice = item.product.discounted_price || item.product.price;
+      const itemPrice = item.variant?.discounted_price || item.variant?.price || 0;
       return total + (itemPrice * item.quantity);
     }, 0);
   };
 
   const total = calculateTotal();
+  const shippingThreshold = 1500;
+  const shippingCost = total >= shippingThreshold ? 0 : 150;
+  const finalTotal = total + shippingCost;
+
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -180,8 +183,9 @@ export default function CartPage() {
               <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                 <div className="divide-y divide-gray-200">
                   {cart.items.map((item) => {
-                    const itemPrice = item.product.discounted_price || item.product.price;
+                    const itemPrice = item.variant?.discounted_price || item.variant?.price || 0;
                     const totalItemPrice = itemPrice * item.quantity;
+                    const variantText = item.variant?.optionValues.map(ov => `${ov.option.name}: ${ov.value}`).join(', ');
 
                     return (
                       <div key={item.id} className="p-4">
@@ -193,7 +197,7 @@ export default function CartPage() {
                           >
                             <div className="relative h-24 w-24 overflow-hidden rounded-md border border-gray-200">
                               <Image
-                                src={item.product.images[0] || '/placeholder.png'}
+                                src={item.product.images?.[0]?.url || '/placeholder.png'}
                                 alt={item.product.name}
                                 fill
                                 className="object-cover"
@@ -210,22 +214,26 @@ export default function CartPage() {
                               {item.product.name}
                             </Link>
 
+                             {variantText && (
+                              <p className="text-sm text-gray-500 mt-1">{variantText}</p>
+                            )}
+
                             {/* Fiyat ve Adet Kontrolü */}
                             <div className="flex items-center justify-between mt-4">
                               {/* Fiyat */}
                               <div className="flex items-center gap-2">
-                                {item.product.discounted_price ? (
+                                {item.variant?.discounted_price ? (
                                   <>
                                     <span className="text-xl font-bold text-red-600">
-                                      {item.product.discounted_price.toFixed(2)} ₺
+                                      {item.variant.discounted_price.toFixed(2)} ₺
                                     </span>
                                     <span className="text-sm text-gray-500 line-through">
-                                      {item.product.price.toFixed(2)} ₺
+                                      {item.variant.price.toFixed(2)} ₺
                                     </span>
                                   </>
                                 ) : (
                                   <span className="text-xl font-bold text-gray-900">
-                                    {item.product.price.toFixed(2)} ₺
+                                    {item.variant ? `${item.variant.price.toFixed(2)} ₺` : 'Fiyat Yok'}
                                   </span>
                                 )}
                               </div>
@@ -286,16 +294,20 @@ export default function CartPage() {
                   </div>
                   <div className="flex justify-between text-gray-600">
                     <span>Kargo:</span>
+                    {shippingCost > 0 ? (
+                      <span>{shippingCost.toFixed(2)} ₺</span>
+                    ) : (
                     <span className="text-green-600 font-medium">Ücretsiz</span>
+                    )}
                   </div>
                   <div className="flex justify-between text-gray-600">
-                    <span>KDV:</span>
-                    <span>{(total * 0.18).toFixed(2)} ₺</span>
+                    <span>KDV (%20):</span>
+                    <span>{(total * 0.20).toFixed(2)} ₺</span>
                   </div>
                   <div className="border-t border-gray-200 pt-3">
                     <div className="flex justify-between text-lg font-bold text-gray-900">
                       <span>Toplam:</span>
-                      <span>{(total * 1.18).toFixed(2)} ₺</span>
+                      <span>{(finalTotal * 1.20).toFixed(2)} ₺</span>
                     </div>
                   </div>
                 </div>

@@ -1,15 +1,24 @@
 import { Breadcrumb } from "@/components/product-detail/Breadcrumb";
-import { ProductGallery } from "@/components/product-detail/ProductGallery";
 import { ProductInfo } from "@/components/product-detail/ProductInfo";
 import { ProductReviews } from "@/components/product-detail/ProductReviews";
 import { SimilarProducts } from "@/components/product-detail/SimilarProducts";
 import { Bestsellers } from "@/components/product-detail/Bestsellers";
 import { Product } from "@/types";
 import React from "react";
+import { notFound } from "next/navigation";
 
 async function getProduct(slug: string): Promise<Product | null> {
     try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+        const apiUrl =
+            typeof window === 'undefined'
+                ? process.env.INTERNAL_API_URL // Sunucu tarafı (SSR)
+                : process.env.NEXT_PUBLIC_API_URL; // Tarayıcı tarafı (Client-side)
+                
+        if (!apiUrl) {
+            console.error('API URL tanımlı değil. Lütfen .env.local veya docker-compose.yml dosyanızı kontrol edin.');
+            return null;
+        }
+
         const res = await fetch(`${apiUrl}/api/products/${slug}`, {
             cache: 'no-store',
         });
@@ -35,39 +44,27 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     const product = await getProduct(slug);
 
     if (!product) {
-        return (
-            <div className="container mx-auto px-4 py-8 text-center">
-                <h1 className="text-3xl font-bold">Ürün Bulunamadı</h1>
-                <p className="mt-4">Aradığınız ürün mevcut değil veya kaldırılmış olabilir.</p>
-            </div>
-        );
+        notFound();
     }
 
     return (
         <div className="bg-white">
             <div className="container mx-auto px-4 py-8">
                 <Breadcrumb category={product.category} productName={product.name} />
-
-                <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-                    {/* Sol Sütun: Ürün Galerisi */}
-                    <div>
-                        <ProductGallery images={product.images} productName={product.name} />
-                    </div>
-
-                    {/* Sağ Sütun: Ürün Bilgileri */}
-                    <div>
-                        <ProductInfo product={product} />
-                    </div>
+                
+                <div className="mt-8">
+                    <ProductInfo product={product} />
                 </div>
 
-                {/* Benzer Ürünler */}
-                <SimilarProducts product={product} />
-
-                {/* Yorumlar Bölümü */}
-                <ProductReviews productId={product.id} />
-
-                {/* Çok Satanlar */}
-                <Bestsellers />
+                <div className="mt-16">
+                    <SimilarProducts categoryId={product.category?.id} currentProductId={product.id} />
+                </div>
+                <div className="mt-16">
+                    <ProductReviews productId={product.id} reviews={product.reviews} />
+                </div>
+                 <div className="mt-16">
+                    <Bestsellers />
+                </div>
             </div>
         </div>
     );

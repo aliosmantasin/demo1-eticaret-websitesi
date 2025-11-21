@@ -1,35 +1,68 @@
 "use client";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { SiteSettings } from "@/types";
 
-const desktopBannerUrl = "https://vr3j8vmadakibxk6.public.blob.vercel-storage.com/e-tic/banner.webp";
-const mobileBannerUrl = "https://vr3j8vmadakibxk6.public.blob.vercel-storage.com/e-tic/mobil-banner.webp";
+export function HomepageBanner() {
+    const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
 
-export function Banner() {
+    useEffect(() => {
+        const fetchSiteSettings = async () => {
+            try {
+                const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+                const response = await fetch(`${apiUrl}/api/settings`, {
+                    cache: 'no-store',
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    setSiteSettings(data);
+                }
+            } catch (error) {
+                console.error('Site ayarları yüklenemedi:', error);
+            }
+        };
+        fetchSiteSettings();
+    }, []);
+
+    if (!siteSettings || siteSettings.homepage_banner_hidden) {
+        return null;
+    }
+
+    const desktopBannerUrl = siteSettings.homepage_banner_desktop_url;
+    const mobileBannerUrl = siteSettings.homepage_banner_mobile_url;
+
+    if (!desktopBannerUrl && !mobileBannerUrl) {
+        return null;
+    }
+
     return (
         <section className="my-4">
             {/* Mobil Banner */}
-            <div className="md:hidden">
-                <Image
-                    src={mobileBannerUrl}
-                    alt="Mobil Banner"
-                    width={500}
-                    height={300}
-                    className="h-auto w-full"
-                    priority
-                />
-            </div>
+            {mobileBannerUrl && (
+                <div className="md:hidden">
+                    <Image
+                        src={mobileBannerUrl}
+                        alt="Mobil Banner"
+                        width={500}
+                        height={300}
+                        className="h-auto w-full"
+                        priority
+                    />
+                </div>
+            )}
             {/* Masaüstü Banner */}
-            <div className="hidden md:block">
-                <Image
-                    src={desktopBannerUrl}
-                    alt="Masaüstü Banner"
-                    width={1920}
-                    height={400}
-                    className="h-auto w-full"
-                    priority
-                />
-            </div>
+            {desktopBannerUrl && (
+                <div className="hidden md:block">
+                    <Image
+                        src={desktopBannerUrl}
+                        alt="Masaüstü Banner"
+                        width={1920}
+                        height={400}
+                        className="h-auto w-full"
+                        priority
+                    />
+                </div>
+            )}
         </section>
     );
 }

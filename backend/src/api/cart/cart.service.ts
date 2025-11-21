@@ -10,6 +10,16 @@ export const getOrCreateCart = async (userId: string) => {
           product: {
             include: {
               category: true,
+              images: true,
+            },
+          },
+          variant: {
+            include: {
+              optionValues: {
+                include: {
+                  option: true,
+                },
+              },
             },
           },
         },
@@ -28,6 +38,16 @@ export const getOrCreateCart = async (userId: string) => {
             product: {
               include: {
                 category: true,
+                images: true,
+              },
+            },
+            variant: {
+              include: {
+                optionValues: {
+                  include: {
+                    option: true,
+                  },
+                },
               },
             },
           },
@@ -40,16 +60,15 @@ export const getOrCreateCart = async (userId: string) => {
 };
 
 // Sepete ürün ekle veya adet artır
-export const addItemToCart = async (userId: string, productId: string, quantity: number) => {
+export const addItemToCart = async (userId: string, productId: string, quantity: number, variantId?: string) => {
   const cart = await getOrCreateCart(userId);
 
-  // Ürünün sepette olup olmadığını kontrol et
-  const existingItem = await prisma.cartItem.findUnique({
+  // Ürünün bu varyantının sepette olup olmadığını kontrol et
+  const existingItem = await prisma.cartItem.findFirst({
     where: {
-      cartId_productId: {
         cartId: cart.id,
-        productId,
-      },
+      productId: productId,
+      variantId: variantId || null,
     },
   });
 
@@ -68,11 +87,12 @@ export const addItemToCart = async (userId: string, productId: string, quantity:
     });
     return updatedItem;
   } else {
-    // Yeni ürün ekle
+    // Yeni ürün/varyant ekle
     const newItem = await prisma.cartItem.create({
       data: {
         cartId: cart.id,
         productId,
+        variantId: variantId || null,
         quantity,
       },
       include: {

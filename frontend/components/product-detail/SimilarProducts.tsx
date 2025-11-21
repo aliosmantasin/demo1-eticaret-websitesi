@@ -5,7 +5,8 @@ import { Product } from '@/types';
 import ProductCard from '@/components/ProductCard';
 
 interface SimilarProductsProps {
-  product: Product;
+  categoryId?: string;
+  currentProductId: string;
 }
 
 async function getSimilarProducts(productId: string, categoryId: string, limit: number = 4): Promise<Product[]> {
@@ -21,7 +22,7 @@ async function getSimilarProducts(productId: string, categoryId: string, limit: 
     
     // Aynı kategorideki ürünleri filtrele (mevcut ürün hariç)
     const similar = allProducts.filter(
-      p => p.category.id === categoryId && p.id !== productId
+      p => p.category?.id === categoryId && p.id !== productId
     );
     
     // Limit'e göre döndür
@@ -32,19 +33,23 @@ async function getSimilarProducts(productId: string, categoryId: string, limit: 
   }
 }
 
-export function SimilarProducts({ product }: SimilarProductsProps) {
+export function SimilarProducts({ categoryId, currentProductId }: SimilarProductsProps) {
   const [similarProducts, setSimilarProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchSimilar = async () => {
-      const products = await getSimilarProducts(product.id, product.category.id);
+      if (!categoryId) {
+        setLoading(false);
+        return;
+      }
+      const products = await getSimilarProducts(currentProductId, categoryId);
       setSimilarProducts(products);
       setLoading(false);
     };
 
     fetchSimilar();
-  }, [product.id, product.category.id]);
+  }, [currentProductId, categoryId]);
 
   if (loading) {
     return (

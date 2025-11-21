@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import prisma from '../../core/services/prisma.service';
 import { z } from 'zod';
+import { User } from '@prisma/client';
 
 // Servisin ihtiyaç duyduğu veri yapısını tanımlıyoruz.
 // Bu, controller'daki Zod şemasından bağımsızdır.
@@ -18,6 +19,14 @@ const LoginSchema = z.object({
   password: z.string(),
 });
 type LoginUserInput = z.infer<typeof LoginSchema>;
+
+export const hashPassword = async (password: string) => {
+  return bcrypt.hash(password, 10);
+};
+
+export const comparePasswords = async (password: string, hash: string) => {
+  return bcrypt.compare(password, hash);
+};
 
 export const createUser = async (userData: CreateUserInput) => {
   const { email, password, firstName, lastName } = userData;
@@ -63,7 +72,7 @@ export const loginUser = async (loginData: LoginUserInput) => {
   }
 
   // NOTE: JWT_SECRET should be in .env file in a real application
-  const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET || 'your-secret-key', {
+  const token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_SECRET || 'your-secret-key', {
     expiresIn: '1h',
   });
 

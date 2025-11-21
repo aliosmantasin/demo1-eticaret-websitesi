@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: password123
       POSTGRES_DB: ecom_db
     ports:
-      - "5432:5432"
+      - "5433:5432" # Portu 5433 olarak değiştirdik
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
@@ -22,13 +22,15 @@ services:
       dockerfile: backend/Dockerfile
     container_name: ecom_backend_api
     ports:
-      - "5001:5000"
+      - "5001:5001"
     volumes:
       - ./backend:/usr/src/app/backend
       # node_modules'ü host makineden mount etme, konteyner içindekini kullan
       - /usr/src/app/backend/node_modules
     environment:
       - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - PORT=5001
     depends_on:
       - postgres
     restart: unless-stopped
@@ -47,7 +49,8 @@ services:
       # node_modules'ü host makineden mount etme, konteyner içindekini kullan
       - /usr/src/app/frontend/node_modules
     environment:
-      - NEXT_PUBLIC_API_URL=http://backend:5000
+      - NEXT_PUBLIC_API_URL=http://localhost:5001
+      - INTERNAL_API_URL=http://backend:5001
     depends_on:
       - backend
     restart: unless-stopped

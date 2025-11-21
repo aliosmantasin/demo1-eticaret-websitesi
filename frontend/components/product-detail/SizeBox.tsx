@@ -1,31 +1,38 @@
+'use client';
+import { cn } from "@/lib/utils";
 import React from "react";
 
 interface SizeBoxProps {
   sizeLabel: string; // e.g. "400G"
-  subLabel?: string; // e.g. "16 servis"
-  selected: boolean;
+  isSelected: boolean;
   onClick: () => void;
- 
+  isAvailable: boolean;
 }
 
-export const SizeBox: React.FC<SizeBoxProps> = ({ sizeLabel, subLabel, selected, onClick }) => {
+export const SizeBox: React.FC<SizeBoxProps> = ({ sizeLabel, isSelected, onClick, isAvailable }) => {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`flex  flex-col items-center justify-center rounded p-2 text-sm font-medium transition relative cursor-pointer
-        ${selected ? "border-3 border-[#2a0aa9]" : "border-2 border-gray-300"}`}
+      className={cn(
+        "relative flex flex-col items-center justify-center rounded-md border bg-white p-3 text-center transition-colors duration-200 focus:outline-none w-28",
+        {
+          "border-2 border-primary": isSelected,
+          "border-gray-300": !isSelected,
+          "hover:border-gray-400": isAvailable,
+          "opacity-50 cursor-not-allowed": !isAvailable,
+        }
+      )}
     >
-      <svg className={`absolute -top-3 -right-3 z-auto w-6 h-6 bg-white rounded-full
-      ${selected ? "block" : "hidden"}`}
-        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-        <path
-         fill="#2a0aa9"
-         d="M256 512a256 256 0 1 1 0-512 256 256 0 1 1 0 512zM374 145.7c-10.7-7.8-25.7-5.4-33.5 5.3L221.1 315.2 169 263.1c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l72 72c5 5 11.8 7.5 18.8 7s13.4-4.1 17.5-9.8L379.3 179.2c7.8-10.7 5.4-25.7-5.3-33.5z" />
+      <span className={cn("text-sm font-semibold text-gray-800", { 'line-through': !isAvailable })}>{sizeLabel}</span>
+
+      {isSelected && (
+        <div className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-white">
+          <svg className="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" />
       </svg>
-     
-      <span className="inline-flex px-4 py-1">{sizeLabel}</span>
-      {subLabel && <span className="text-xs text-gray-500">{subLabel}</span>}
+        </div>
+      )}
     </button>
   );
 };
