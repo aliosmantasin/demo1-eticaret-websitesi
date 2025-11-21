@@ -65,6 +65,15 @@ Projenin Docker üzerinde çalıştırılmaya çalışıldığı sırada, saatle
     2. Yorumlar yine de güncel kalsın diye `fetchReviews` fonksiyonu `useCallback` ile tanımlanıp `useEffect` içinde tetiklendi; form gönderimleri aynı fonksiyonu yeniden kullanıyor.
     3. `app/urun/[slug]/page.tsx` ve `app/paketler/[slug]/page.tsx` dosyalarında `ProductReviews` çağrıları `initialReviews={product.reviews}` şeklinde güncellendi.
 
+## Sorun: ProductReviews Kullanıcı Verisi Şekil Uyumsuzluğu (Kasım 2025)
+
+- **Hata Belirtisi:** Vercel build’i `ProductReviews.tsx` içinde `user.firstName` alanına erişilmeye çalışıldığı, fakat tipte yalnızca `name` tanımlı olduğu için `Property 'firstName' does not exist on type '{ name: string; }'` hatası veriyordu.
+- **Neden:** Backend’den dönen yorum verisi bazı yerlerde sadece `name` içeriyor, bazı yerlerde `firstName/lastName` kombinasyonu bekleniyor. TypeScript tipi ve UI mantığı bu iki senaryoyu kapsamadığı için derleme düşüyordu.
+- **Çözüm Adımları:**
+    1. `frontend/types/index.ts` içindeki `Review.user` tanımı `name?`, `firstName?`, `lastName?` alanlarını opsiyonel olacak şekilde genişletildi.
+    2. `ProductReviews` bileşenindeki `getUserInitials` fonksiyonu her iki veri şeklini destekleyecek şekilde güncellendi; isim yoksa varsayılan “A” gösteriyor.
+    3. Kullanıcı adını yazan kısım, önce `firstName/lastName`, yoksa `name` değeriyle render edilecek şekilde düzenlendi.
+
 
 
 ## Sorun: API URL Tutarsızlığı (IDE vs. Docker Modu) (Kasım 2025)

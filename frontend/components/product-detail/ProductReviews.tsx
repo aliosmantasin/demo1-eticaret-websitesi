@@ -107,7 +107,15 @@ export function ProductReviews({ productId, initialReviews }: ProductReviewsProp
   const getUserInitials = (user: Review['user']) => {
     const first = user.firstName?.[0] || '';
     const last = user.lastName?.[0] || '';
-    return `${first}${last}`.toUpperCase() || 'A';
+    if (first || last) {
+      return `${first}${last}`.toUpperCase();
+    }
+    const name = user.name?.trim() || '';
+    if (!name) return 'A';
+    const parts = name.split(' ');
+    const initials =
+      (parts[0]?.[0] || '') + (parts.length > 1 ? parts[parts.length - 1]?.[0] || '' : '');
+    return (initials || name[0]).toUpperCase();
   };
 
   if (loading) {
@@ -207,7 +215,8 @@ export function ProductReviews({ productId, initialReviews }: ProductReviewsProp
                   </div>
                   <div>
                     <p className="font-semibold">
-                      {review.user.firstName} {review.user.lastName?.charAt(0)}
+                      {review.user.firstName || review.user.name}
+                      {review.user.lastName ? ` ${review.user.lastName}` : ''}
                     </p>
                     <p className="text-sm text-gray-500">{formatDate(review.createdAt)}</p>
                   </div>

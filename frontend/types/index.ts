@@ -22,7 +22,9 @@ export interface Review {
   comment: string;
   createdAt: string;
   user: {
-    name: string;
+    name?: string;
+    firstName?: string | null;
+    lastName?: string | null;
   };
 }
 
