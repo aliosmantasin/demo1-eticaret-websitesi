@@ -12,6 +12,10 @@ interface ProductReviewsProps {
   initialReviews?: Review[];
 }
 
+/**
+ * ProductReviews bileşeni - Backend hazır olana kadar kullanılmıyor
+ * İleride backend entegrasyonu tamamlandığında sayfalara eklenebilir
+ */
 export function ProductReviews({ productId, initialReviews }: ProductReviewsProps) {
   const [reviews, setReviews] = useState<Review[]>(initialReviews ?? []);
   const [loading, setLoading] = useState(!initialReviews);

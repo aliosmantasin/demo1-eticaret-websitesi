@@ -74,6 +74,11 @@ Projenin Docker üzerinde çalıştırılmaya çalışıldığı sırada, saatle
     2. `ProductReviews` bileşenindeki `getUserInitials` fonksiyonu her iki veri şeklini destekleyecek şekilde güncellendi; isim yoksa varsayılan “A” gösteriyor.
     3. Kullanıcı adını yazan kısım, önce `firstName/lastName`, yoksa `name` değeriyle render edilecek şekilde düzenlendi.
 
+## Not: ProductReviews Bileşeninin Geçici Olarak Devre Dışı Bırakılması (Kasım 2025)
+
+- **Durum:** Backend tarafında yorum servisi ve veritabanı henüz hazır olmadığı için `ProductReviews` bileşeni uygulamada kullanılmıyordu. Buna rağmen sayfa seviyesinde import edilip render edildiğinden build süreci gereksiz tip/derleme hatalarıyla kesiliyordu.
+- **Aksiyon:** `app/urun/[slug]/page.tsx` ve `app/paketler/[slug]/page.tsx` dosyalarından `ProductReviews` import’u ve render blokları kaldırıldı. Bileşen dosyası projede tutuluyor; backend tamamlandığında yeniden entegre edilecek.
+
 
 
 ## Sorun: API URL Tutarsızlığı (IDE vs. Docker Modu) (Kasım 2025)

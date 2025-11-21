@@ -1,6 +1,5 @@
 import { Breadcrumb } from "@/components/product-detail/Breadcrumb";
 import { ProductInfo } from "@/components/product-detail/ProductInfo";
-import { ProductReviews } from "@/components/product-detail/ProductReviews";
 import { SimilarProducts } from "@/components/product-detail/SimilarProducts";
 import { Bestsellers } from "@/components/product-detail/Bestsellers";
 import { Product } from "@/types";
@@ -67,9 +66,6 @@ export default async function PackageDetailPage({ params }: { params: Promise<{ 
 
                 <div className="mt-16">
                     <SimilarProducts categoryId={product.category?.id} currentProductId={product.id} />
-                </div>
-                <div className="mt-16">
-                    <ProductReviews productId={product.id} initialReviews={product.reviews} />
                 </div>
                  <div className="mt-16">
                     <Bestsellers />

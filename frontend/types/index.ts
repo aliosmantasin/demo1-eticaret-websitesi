@@ -19,6 +19,7 @@ export interface Category {
 export interface Review {
   id: string;
   rating: number;
+  title?: string | null;
   comment: string;
   createdAt: string;
   user: {
