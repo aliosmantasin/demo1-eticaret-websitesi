@@ -175,8 +175,6 @@ export const ProductInfo = ({ product }: { product: Product }) => {
         );
     }, [product.variants]);
     
-    const finalPrice = selectedCombination.displayPrice;
-
     // Reset quantity to 1 if the selected variant changes
     useEffect(() => {
         setQuantity(1);

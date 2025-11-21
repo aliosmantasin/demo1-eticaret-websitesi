@@ -123,7 +123,7 @@ export default function AdminPage() {
       } else {
         setOptions([]);
       }
-    } catch (error) {
+    } catch {
       setOptions([]);
     }
   }, [authFetch]);

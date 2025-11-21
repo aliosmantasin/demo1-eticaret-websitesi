@@ -14,15 +14,11 @@ export const ProductGallery = ({ images, variantImages }: ProductGalleryProps) =
   // Ana görsel her zaman ürün görsellerinden ilki olmalı
   const mainImage = images[0] || null;
   const [activeImage, setActiveImage] = useState<ImageType | null>(mainImage);
-  const [userSelectedImage, setUserSelectedImage] = useState<ImageType | null>(null);
   
   // Thumbnail'ler: Önce ürün görselleri, sonra varyant görselleri (varsa)
   const [displayImages, setDisplayImages] = useState<ImageType[]>(images);
 
   useEffect(() => {
-    // Varyant değiştiğinde kullanıcının seçtiği görseli sıfırla
-    setUserSelectedImage(null);
-    
     // Thumbnail'leri birleştir: Önce ürün görselleri, sonra varyant görselleri
     const combinedImages = [...images];
     if (variantImages && variantImages.length > 0) {
@@ -67,7 +63,6 @@ export const ProductGallery = ({ images, variantImages }: ProductGalleryProps) =
              key={image.id}
              onClick={() => {
                setActiveImage(image);
-               setUserSelectedImage(image);
              }}
              className={cn(
                "relative w-full aspect-square rounded-md overflow-hidden transition-all duration-200",

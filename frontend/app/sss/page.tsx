@@ -3,12 +3,6 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
-interface FAQItem {
-  id: string;
-  question: string;
-  answer: string;
-}
-
 const faqCategories = [
   {
     id: 'genel',

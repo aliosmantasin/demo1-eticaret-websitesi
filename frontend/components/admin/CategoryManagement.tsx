@@ -54,7 +54,7 @@ export const CategoryManagement: React.FC<CategoryManagementProps> = ({
       if (!response.ok) throw new Error('Kategori silinemedi');
       fetchCategories();
       alert('Kategori silindi');
-    } catch (error) {
+    } catch {
       alert('Kategori silinirken bir hata oluştu');
     }
   };
@@ -84,7 +84,7 @@ export const CategoryManagement: React.FC<CategoryManagementProps> = ({
       setIsCategoryFormOpen(false);
       fetchCategories();
       alert(isEditingCategory ? 'Kategori güncellendi' : 'Kategori eklendi');
-    } catch (error) {
+    } catch {
       alert('Bir hata oluştu. Lütfen tekrar deneyin.');
     }
   };

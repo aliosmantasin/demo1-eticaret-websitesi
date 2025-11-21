@@ -3,8 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { User, Package, MapPin, ArrowLeft } from 'lucide-react';
+import { User, Package, MapPin } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 // Mock order data - MVP için
 interface MockOrder {
@@ -146,10 +147,12 @@ export default function OrdersPage() {
                       {order.items.map((item, idx) => (
                         <div key={idx} className="flex items-center gap-4">
                           <div className="relative w-20 h-20 overflow-hidden rounded-md border border-gray-200 shrink-0">
-                            <img
+                            <Image
                               src={item.image}
                               alt={item.name}
-                              className="w-full h-full object-cover"
+                              fill
+                              className="object-cover"
+                              sizes="80px"
                             />
                           </div>
                           <div className="flex-1">

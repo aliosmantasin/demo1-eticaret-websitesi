@@ -78,3 +78,4 @@ docs(readme): update setup instructions
 ## 8. Hata Çözme Stratejisi
 
 - **Önce Resmi Dokümantasyon:** Bir teknolojiye (Next.js, Docker, Prisma vb.) özgü, inatçı veya anlaşılması zor bir hatayla karşılaşıldığında, deneme-yanılma yöntemlerine başvurmadan önce ilk adım her zaman o teknolojinin **resmi dokümantasyonunu** veya hata mesajında belirtilen linki incelemek olmalıdır. Bu, en doğru ve güncel çözüme en hızlı şekilde ulaşmayı sağlar.
+- **Şeffaf Onarım Süreci:** Herhangi bir sorun giderimine başlamadan önce, yapılacak değişiklikler sohbet içinde özetlenecek ve çalışmanın tamamı `docs/TROUBLESHOOTING.md` dosyasına kayıt altına alınacaktır. Böylece hem iletişim hem de dokümantasyon eşzamanlı güncel tutulur.

@@ -29,20 +29,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const setToken = (newToken: string | null) => {
+  const setToken = useCallback((newToken: string | null) => {
     setTokenState(newToken);
     if (newToken) {
       localStorage.setItem('authToken', newToken);
     } else {
       localStorage.removeItem('authToken');
     }
-  };
+  }, [setTokenState]);
 
   const logout = useCallback(() => {
     setToken(null);
     // İsteğe bağlı: çıkış yapıldığında direkt giriş sayfasına yönlendirilebilir.
     // router.push('/giris-yap'); 
-  }, [router]);
+  }, [setToken]);
 
   // Yeni merkezi fetch fonksiyonu
   const authFetch = useCallback(async (url: string, options: RequestInit = {}) => {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -42,7 +42,7 @@ export const FooterManagement: React.FC<FooterManagementProps> = ({
 
   const maxPopularProducts = siteSettings?.popular_products_limit ?? 9;
 
-  const fetchFooterLinks = async () => {
+  const fetchFooterLinks = useCallback(async () => {
     try {
       setIsLoadingLinks(true);
       const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -60,9 +60,9 @@ export const FooterManagement: React.FC<FooterManagementProps> = ({
     } finally {
       setIsLoadingLinks(false);
     }
-  };
+  }, [authFetch]);
 
-  const fetchSiteSettings = async () => {
+  const fetchSiteSettings = useCallback(async () => {
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL;
       const response = await authFetch(`${apiUrl}/api/settings`);
@@ -73,12 +73,12 @@ export const FooterManagement: React.FC<FooterManagementProps> = ({
     } catch (error) {
       console.error('Site ayarları yüklenemedi:', error);
     }
-  };
+  }, [authFetch]);
 
   useEffect(() => {
     fetchFooterLinks();
     fetchSiteSettings();
-  }, []);
+  }, [fetchFooterLinks, fetchSiteSettings]);
 
   const handleAddLink = (section: FooterSection) => {
     if (section === 'COMPANY') {
@@ -342,7 +342,7 @@ export const FooterManagement: React.FC<FooterManagementProps> = ({
       <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6 space-y-4">
         <h3 className="text-lg font-semibold text-gray-900">Footer Metni</h3>
         <p className="text-sm text-gray-600">
-          Footer'ın alt kısmında gösterilecek telif hakkı metnini düzenleyin.
+          Footer&rsquo;ın alt kısmında gösterilecek telif hakkı metnini düzenleyin.
         </p>
         <textarea
           value={siteSettings?.footer_copyright_text || ''}
@@ -359,7 +359,7 @@ export const FooterManagement: React.FC<FooterManagementProps> = ({
       <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6 space-y-4">
         <h3 className="text-lg font-semibold text-gray-900">Footer Credits (Yapım Bilgisi)</h3>
         <p className="text-sm text-gray-600">
-          Footer'ın alt kısmında gösterilecek yapım bilgisi metni ve linki (ör: "Settobox Dijital Pazarlama tarafından yapılmıştır").
+          Footer&rsquo;ın alt kısmında gösterilecek yapım bilgisi metni ve linki (ör: &quot;Settobox Dijital Pazarlama tarafından yapılmıştır&quot;).
         </p>
         <div className="space-y-3">
           <div>
