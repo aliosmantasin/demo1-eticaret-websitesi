@@ -56,6 +56,15 @@ Projenin Docker üzerinde çalıştırılmaya çalışıldığı sırada, saatle
         }
         ```
 
+## Sorun: ProductReviews Prop Uyumsuzluğu (Kasım 2025)
+
+- **Hata Belirtisi:** Vercel build sırasında `ProductReviews` bileşenine `reviews` prop’u geçtiğimiz için `Property 'reviews' does not exist on type 'ProductReviewsProps'` tip hatasıyla build duruyordu.
+- **Neden:** Bileşen yalnızca `productId` bekleyecek şekilde bırakılmış, ancak sayfa seviyesinde SSR ile çekilen `product.reviews` verisi de gönderilmeye devam ediyordu. Bu yarım kalan yapılandırma hem tip uyuşmazlığına hem de komponentin önceden yüklenen veriden yararlanamamasına yol açtı.
+- **Çözüm Adımları:**
+    1. Bileşene `initialReviews` adında opsiyonel bir prop eklendi ve state başlangıç değeri bu prop’tan beslenecek hale getirildi; ilk render’da veri varsa `loading` göstergesi kapalı kalıyor.
+    2. Yorumlar yine de güncel kalsın diye `fetchReviews` fonksiyonu `useCallback` ile tanımlanıp `useEffect` içinde tetiklendi; form gönderimleri aynı fonksiyonu yeniden kullanıyor.
+    3. `app/urun/[slug]/page.tsx` ve `app/paketler/[slug]/page.tsx` dosyalarında `ProductReviews` çağrıları `initialReviews={product.reviews}` şeklinde güncellendi.
+
 
 
 ## Sorun: API URL Tutarsızlığı (IDE vs. Docker Modu) (Kasım 2025)

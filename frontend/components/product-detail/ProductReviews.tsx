@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Review } from '@/types';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -9,11 +9,12 @@ import { Star } from 'lucide-react';
 
 interface ProductReviewsProps {
   productId: string;
+  initialReviews?: Review[];
 }
 
-export function ProductReviews({ productId }: ProductReviewsProps) {
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [loading, setLoading] = useState(true);
+export function ProductReviews({ productId, initialReviews }: ProductReviewsProps) {
+  const [reviews, setReviews] = useState<Review[]>(initialReviews ?? []);
+  const [loading, setLoading] = useState(!initialReviews);
   const [showForm, setShowForm] = useState(false);
   const { token } = useAuth();
 
@@ -23,9 +24,14 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
     comment: '',
   });
 
-  const fetchReviews = async () => {
+  const fetchReviews = useCallback(async () => {
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      if (!apiUrl) {
+        console.error('NEXT_PUBLIC_API_URL tanımlı değil. Yorumlar getirilemedi.');
+        setLoading(false);
+        return;
+      }
       const response = await fetch(`${apiUrl}/api/reviews/product/${productId}`);
       if (response.ok) {
         const data = await response.json();
@@ -36,12 +42,11 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [productId]);
 
   useEffect(() => {
     fetchReviews();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [productId]);
+  }, [fetchReviews]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -60,7 +60,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                     <SimilarProducts categoryId={product.category?.id} currentProductId={product.id} />
                 </div>
                 <div className="mt-16">
-                    <ProductReviews productId={product.id} reviews={product.reviews} />
+                    <ProductReviews productId={product.id} initialReviews={product.reviews} />
                 </div>
                  <div className="mt-16">
                     <Bestsellers />
